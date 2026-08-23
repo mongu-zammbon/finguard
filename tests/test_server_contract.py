@@ -58,6 +58,14 @@ class ServerContractTests(unittest.TestCase):
         for asset in ("pitch.html", "pitch.css", "pitch.js"):
             self.assertTrue((WEB_ROOT / asset).is_file(), asset)
 
+    def test_service_exposes_low_friction_entry_paths(self) -> None:
+        index_html = (WEB_ROOT / "index.html").read_text(encoding="utf-8")
+        for mode in ("share", "screenshot", "link"):
+            self.assertIn(f'data-entry-mode="{mode}"', index_html)
+        self.assertIn('id="screenshot-input"', index_html)
+        self.assertIn("공유받은 문자", index_html)
+        self.assertIn("결제 링크", index_html)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -19,25 +19,46 @@
       <section class="hero">
         <div class="eyebrow">FINANCIAL CONVERSATION SAFETY GATE</div>
         <h1>행동하기 전에,<br /><span>한 번 멈춰보세요.</span></h1>
-        <p>의심스러운 금융 대화를 붙여넣으면 위험 신호, 근거 문장,<br class="desktop-only" /> 지금 할 수 있는 안전한 다음 행동을 보여줍니다.</p>
+        <p>문자·스크린샷·결제 링크를 공유하면 위험 신호, 근거 문장,<br class="desktop-only" /> 지금 멈출 행동과 공식 확인 경로를 보여줍니다.</p>
+        <div class="hero-context" aria-label="첫 서비스 가설">
+          <div class="hero-context-card"><span>WHO</span><strong>금융 사기 문자를 받은 사람</strong><small>대신 확인하는 가족·보호자까지</small></div>
+          <div class="hero-context-card"><span>WHEN</span><strong>송금·인증·클릭 30초 전</strong><small>행동 직전의 짧은 멈춤</small></div>
+          <div class="hero-context-card"><span>HOW</span><strong>공유 · 스크린샷 · 링크</strong><small>붙여넣기는 마지막 fallback</small></div>
+        </div>
       </section>
 
       <section class="workspace" aria-label="대화 분석">
         <div class="input-panel panel">
           <div class="panel-heading">
             <div>
-              <div class="section-kicker">01 / INPUT</div>
-              <h2>의심 대화 붙여넣기</h2>
+              <div class="section-kicker">01 / ENTRY</div>
+              <h2 id="input-title">공유받은 내용 확인</h2>
             </div>
             <span class="privacy-badge">입력 내용 저장 안 함</span>
           </div>
-          <textarea id="message" maxlength="12000" placeholder="예: 금융감독원입니다. 계좌가 범죄에 연루됐으니 지금 안전계좌로 이체하세요."></textarea>
+          <div class="entry-chooser" aria-label="FinGuard 진입 경로">
+            <div class="section-label">진입 경로</div>
+            <div class="entry-options" role="group" aria-label="분석할 입력의 출처">
+              <button class="entry-option is-active" type="button" data-entry-mode="share" aria-pressed="true"><strong>공유받은 문자</strong><small>SMS · 메신저</small></button>
+              <button class="entry-option" type="button" data-entry-mode="screenshot" aria-pressed="false"><strong>스크린샷</strong><small>화면 캡처</small></button>
+              <button class="entry-option" type="button" data-entry-mode="link" aria-pressed="false"><strong>결제 링크</strong><small>중고거래 · DM</small></button>
+            </div>
+            <p id="entry-mode-note" class="entry-mode-note" aria-live="polite">문자나 카카오톡에서 FinGuard로 공유받은 상황을 재현합니다.</p>
+          </div>
+          <div id="screenshot-picker" class="screenshot-picker hidden">
+            <label class="screenshot-label" for="screenshot-input">화면 캡처 선택</label>
+            <input id="screenshot-input" class="screenshot-input" type="file" accept="image/*" />
+            <p id="screenshot-state" class="screenshot-state">이미지는 서버로 보내지 않습니다. 데모에서는 OCR 결과를 아래 입력창에 넣습니다.</p>
+            <img id="screenshot-preview" class="screenshot-preview hidden" alt="선택한 금융 대화 스크린샷 미리보기" />
+          </div>
+          <label class="message-label" for="message"><span id="message-label-text">공유받은 문장</span><small>텍스트 fallback</small></label>
+          <textarea id="message" maxlength="12000" aria-describedby="entry-mode-note screenshot-state" placeholder="예: 금융감독원입니다. 계좌가 범죄에 연루됐으니 지금 안전계좌로 이체하세요."></textarea>
           <div class="input-footer">
             <span id="char-count">0 / 12,000</span>
             <button id="analyze" class="primary-button">안전 분석하기 <span>→</span></button>
           </div>
           <div class="demo-row">
-            <span class="demo-label">바로 보기</span>
+            <span class="demo-label">상황 바로 보기</span>
             <div id="demo-cases" class="demo-cases"></div>
           </div>
         </div>
@@ -52,7 +73,7 @@
           </div>
           <div id="empty-state" class="empty-state">
             <div class="empty-icon">↗</div>
-            <p>왼쪽에 메시지를 붙여넣고<br />분석 버튼을 눌러보세요.</p>
+            <p>받은 내용의 진입 경로를 고르고<br />안전 분석을 눌러보세요.</p>
             <small>결과는 판정이 아니라 안전한 다음 행동을 위한 신호입니다.</small>
           </div>
           <div id="result-body" class="result-body hidden">
