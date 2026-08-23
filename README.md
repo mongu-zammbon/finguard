@@ -27,12 +27,12 @@ python3 -m app.server --port 8765
 
 브라우저에서 [http://127.0.0.1:8765](http://127.0.0.1:8765)를 엽니다.
 
-오늘 회의의 기본 화면은 발표 모드입니다.
+서비스 제안서를 읽을 때는 발표 모드를 사용합니다.
 
-- 발표용 스크롤 프레젠테이션: [http://127.0.0.1:8765/pitch](http://127.0.0.1:8765/pitch)
+- 서비스 제안용 스크롤 프레젠테이션: [http://127.0.0.1:8765/pitch](http://127.0.0.1:8765/pitch)
 - 실제 서비스 thin slice: [http://127.0.0.1:8765/](http://127.0.0.1:8765/)
 
-발표 모드에서 `90초 데모 시작`을 누르면 기관 사칭, 입력 공격, 원격제어, 투자, 중고거래, 낮은 위험/비증명 케이스가 순서대로 재생됩니다. 서비스 화면에서는 진입 경로를 먼저 보여준 뒤 중고거래 케이스를 누르면 `결제 링크` 경로가 자동 선택됩니다. 마지막에는 팀원이 가져온 아이디어 이름을 입력해 같은 기준으로 비교할 수 있습니다. 상세 대본은 [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)에 있습니다.
+발표 모드에서 `90초 데모 시작`을 누르면 기관 사칭, 입력 공격, 원격제어, 투자, 중고거래, 낮은 위험/비증명 케이스가 순서대로 재생됩니다. 서비스 화면에서는 진입 경로를 먼저 보여준 뒤 중고거래 케이스를 누르면 `결제 링크` 경로가 자동 선택됩니다. 마지막에는 다른 아이디어 이름을 입력해 같은 기준으로 비교할 수 있습니다. 상세 대본은 [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)에 있습니다.
 
 ## AI-DLC 자문 호출 — Claude Bedrock
 
@@ -43,7 +43,7 @@ ssh macmini '/opt/homebrew/bin/aws sso login --profile claude-code'
 ssh macmini '/Users/seok/.local/bin/claude-bedrock -p "PROMPT" --no-session-persistence --output-format text --permission-mode plan --model sonnet'
 ```
 
-`/Users/seok/.local/bin/claude-bedrock`은 맥미니에 있는 파일이며, 로컬 `/opt/homebrew/bin/claude`와 다릅니다. 실제 호출 기록과 wedge 논의는 [`docs/MEETING_MINUTES.md`](docs/MEETING_MINUTES.md), 회의용 서비스 판단 자료는 [`docs/MEETING_BRIEF.md`](docs/MEETING_BRIEF.md)에 있습니다.
+`/Users/seok/.local/bin/claude-bedrock`은 맥미니에 있는 파일이며, 로컬 `/opt/homebrew/bin/claude`와 다릅니다. 실제 호출 기록과 wedge 논의는 [`docs/MEETING_MINUTES.md`](docs/MEETING_MINUTES.md), 서비스 제안 브리프는 [`docs/MEETING_BRIEF.md`](docs/MEETING_BRIEF.md)에 있습니다.
 
 ## 검증
 
@@ -57,7 +57,7 @@ python3 -m compileall -q app
 - 현재 분석기는 설명 가능한 규칙 기반 데모 엔진입니다. 운영 금융 판단이나 사기 확정이 아닙니다.
 - 입력 텍스트를 저장하지 않으며, 서버 로그에는 붙여 넣은 본문을 기록하지 않습니다.
 - URL을 열거나 계좌·기관 API에 연결하지 않습니다.
-- 개인정보가 포함된 원문은 회의 화면에 공유하지 말고, 테스트 데이터로 대체합니다.
+- 개인정보가 포함된 원문은 공유 화면에 넣지 말고, 테스트 데이터로 대체합니다.
 - 공식 대회 정보는 [DAKER 2026 Finance AI Challenge](https://daker.ai/public/hackathons/2026-finance-ai-challenge)를 기준으로 확인합니다.
 
 ## 구조
@@ -66,8 +66,8 @@ python3 -m compileall -q app
 app/analyzer.py          deterministic rules + stable result contract
 app/server.py            stdlib HTTP API and static file server
 web/index.html           direct service thin slice
-web/pitch.html           scrollable meeting presentation mode
-web/                     meeting demo UI and presentation assets
+web/pitch.html           scrollable service proposal mode
+web/                     service demo UI and presentation assets
 tests/                   unittest contract and behavior tests
-docs/                    product, API, safety, and meeting materials
+docs/                    product, API, safety, and validation materials
 ```

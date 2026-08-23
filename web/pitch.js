@@ -133,7 +133,7 @@ function stopSequence() {
 
 function runSequence(index = 0) {
   if (!cases.length || index >= cases.length) {
-    setSequenceStatus("전체 케이스가 끝났습니다. 이제 팀원의 문장을 받아보세요.");
+    setSequenceStatus("전체 케이스가 끝났습니다. 이제 문장을 직접 테스트해보세요.");
     sequenceStart.textContent = "90초 데모 다시 시작 ▶";
     sequenceTimer = null;
     return;
