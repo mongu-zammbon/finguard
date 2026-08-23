@@ -16,6 +16,7 @@ Claude 의견은 로컬 `omx ask claude`가 아니라 맥미니의 Bedrock 래�
 실행 경로:
 
 ```bash
+ssh macmini '/opt/homebrew/bin/aws sso login --profile claude-code'
 ssh macmini '/Users/seok/.local/bin/claude-bedrock -p "..." --no-session-persistence --output-format text --permission-mode plan --model sonnet'
 ```
 
