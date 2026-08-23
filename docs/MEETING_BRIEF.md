@@ -94,7 +94,7 @@ FinGuard의 경쟁력은 “더 많은 위험 단어”가 아니다. **대화 �
 Claude 의견은 일반 `claude.ai` 세션이 아니라 맥미니의 AWS Bedrock 래퍼로 수신했다. 로컬에서 실행할 때는 다음처럼 맥미니 절대경로를 사용한다.
 
 ```bash
-aws sso login --profile claude-code
+ssh macmini '/opt/homebrew/bin/aws sso login --profile claude-code'
 ssh macmini '/Users/seok/.local/bin/claude-bedrock -p "금융 사기 서비스 wedge를 비판적으로 검토해줘" --no-session-persistence --output-format text --permission-mode plan --model sonnet'
 ```
 

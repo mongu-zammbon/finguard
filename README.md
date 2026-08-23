@@ -28,7 +28,7 @@ python3 -m app.server --port 8765
 Claude 의견은 로컬 `claude.ai` 세션이 아니라 맥미니의 Bedrock 래퍼로 호출합니다. 맥미니에서 AWS SSO를 먼저 갱신한 뒤, 로컬 터미널에서 절대경로를 지정합니다.
 
 ```bash
-aws sso login --profile claude-code
+ssh macmini '/opt/homebrew/bin/aws sso login --profile claude-code'
 ssh macmini '/Users/seok/.local/bin/claude-bedrock -p "PROMPT" --no-session-persistence --output-format text --permission-mode plan --model sonnet'
 ```
 
