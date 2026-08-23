@@ -1,0 +1,13 @@
+[build-system]
+requires = []
+build-backend = "backend"
+
+[project]
+name = "finguard-demo"
+version = "0.1.0"
+description = "Local-only financial conversation safety gate demo"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.finguard]
+runtime = "python-stdlib-only"
