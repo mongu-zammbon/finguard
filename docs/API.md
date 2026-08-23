@@ -23,8 +23,23 @@
 회의용 사전 입력 케이스를 반환한다.
 
 ```json
-{"cases":[{"id":"danger-transfer","label":"DANGER","title":"기관 사칭 + 안전계좌 이체","text":"..."}]}
+{
+  "cases": [
+    {"id":"danger-transfer","label":"DANGER","title":"기관 사칭 + 안전계좌 이체","text":"..."},
+    {"id":"prompt-injection","label":"INJECTION","title":"분석기를 흔드는 지시문","text":"..."},
+    {"id":"danger-remote","label":"DANGER","title":"원격제어 앱 설치 요청","text":"..."},
+    {"id":"danger-investment","label":"DANGER","title":"원금 보장 투자 제안","text":"..."},
+    {"id":"danger-marketplace","label":"CAUTION","title":"중고거래 안전결제 링크","text":"..."},
+    {"id":"low-risk-not-proof","label":"LOW_RISK_NOT_PROOF","title":"일반 공지처럼 보이는 메시지","text":"..."}
+  ]
+}
 ```
+
+케이스의 `label`은 발표용 기대 라벨이며, 운영 환경의 정답 또는 모델 성능 지표가 아니다. `text`는 합성 데모 입력이고 저장하지 않는다.
+
+## `GET /pitch`, `/pitch.css`, `/pitch.js`
+
+오늘 미팅용 정적 발표 모드다. 외부 자산을 불러오지 않으며, 발표 화면의 라이브 데모는 위 `GET /v1/demo-cases`와 `POST /v1/analyze`만 사용한다. `90초 데모 시작`은 브라우저 안에서 케이스를 순서대로 선택할 뿐, 송금·로그인·URL 방문을 수행하지 않는다.
 
 ## `POST /v1/analyze`
 

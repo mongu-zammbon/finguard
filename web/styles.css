@@ -27,6 +27,9 @@ button, textarea { font: inherit; }
 .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
 .brand-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; background: var(--mint); color: #0b1220; }
 .topbar-meta { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+.pitch-link { margin-left: auto; color: var(--mint); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-decoration: none; }
+.pitch-link span { margin-left: 3px; font-size: 14px; }
+.pitch-link:hover { color: var(--ink); }
 .live-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; background: var(--mint); box-shadow: 0 0 0 4px #c9f27c1e; }
 .divider { margin: 0 8px; color: var(--line); }
 .hero { padding: 70px 0 46px; }
@@ -71,6 +74,10 @@ textarea::placeholder { color: #6e7d91; }
 .score-block strong { display: block; margin-top: 5px; font-size: 24px; letter-spacing: -.04em; }
 .action-callout { margin-top: 12px; padding: 16px; border-left: 3px solid var(--mint); border-radius: 14px; background: #c9f27c12; }
 .safe-action { margin-top: 8px; color: var(--ink); font-size: 18px; font-weight: 750; line-height: 1.45; letter-spacing: -.04em; }
+.action-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.action-checklist > div { padding-top: 9px; border-top: 1px solid #c9f27c40; }
+.action-checklist span { color: var(--mint); font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+.action-checklist p { margin: 5px 0 0; color: var(--ink); font-size: 12px; line-height: 1.5; }
 .evidence-section, .reason-section { margin-top: 20px; }
 .section-label { color: var(--muted); letter-spacing: .05em; }
 .evidence-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
@@ -88,6 +95,7 @@ textarea::placeholder { color: #6e7d91; }
 }
 @media (max-width: 520px) {
   .topbar-meta { display: none; }
+  .pitch-link { margin-left: auto; }
   .hero h1 { font-size: 48px; }
   .desktop-only { display: none; }
   .input-panel, .result-panel { padding: 18px; }
@@ -96,4 +104,5 @@ textarea::placeholder { color: #6e7d91; }
   .input-footer { align-items: flex-start; flex-direction: column; }
   .primary-button { width: 100%; }
   .demo-row { align-items: flex-start; flex-direction: column; }
+  .action-checklist { grid-template-columns: 1fr; }
 }

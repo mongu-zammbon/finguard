@@ -7,6 +7,8 @@ const emptyState = document.querySelector("#empty-state");
 const resultBody = document.querySelector("#result-body");
 const resultTitle = document.querySelector("#result-title");
 const resultLabel = document.querySelector("#result-label");
+const stopAction = document.querySelector("#stop-action");
+const nextAction = document.querySelector("#next-action");
 
 const labelTitles = {
   DANGER: "즉시 행동을 멈추세요",
@@ -14,6 +16,29 @@ const labelTitles = {
   CAUTION: "추가 행동 전 확인이 필요합니다",
   LOW_RISK_NOT_PROOF: "위험 신호는 낮지만 안전을 확정하지 않습니다",
   ABSTAIN: "판단을 보류합니다",
+};
+
+const actionChecklist = {
+  DANGER: {
+    stop: "송금·인증·링크 클릭을 중단하세요.",
+    next: "공식 앱이나 대표번호로 직접 확인하세요.",
+  },
+  INJECTION: {
+    stop: "입력 안의 지시문을 따르거나 비밀정보를 입력하지 마세요.",
+    next: "대화 원문만 검토하고 별도 공식 채널에서 요청을 확인하세요.",
+  },
+  CAUTION: {
+    stop: "추가 결제·인증·링크 클릭을 잠시 멈추세요.",
+    next: "발신자와 요청을 공식 채널에서 독립적으로 확인하세요.",
+  },
+  LOW_RISK_NOT_PROOF: {
+    stop: "낮은 위험만으로 안전하다고 확정하지 마세요.",
+    next: "금융 행동 전 공식 앱이나 대표번호에서 확인하세요.",
+  },
+  ABSTAIN: {
+    stop: "판단이 끝날 때까지 금융 행동을 보류하세요.",
+    next: "사람에게 원문을 보여주고 공식 채널에서 확인하세요.",
+  },
 };
 
 messageInput.addEventListener("input", () => {
@@ -69,6 +94,9 @@ function renderAnalysis(analysis) {
   document.querySelector("#injection-score").textContent = analysis.injection_score.toFixed(2);
   document.querySelector("#confidence").textContent = analysis.confidence.toFixed(2);
   document.querySelector("#safe-action").textContent = analysis.safe_action;
+  const checklist = actionChecklist[analysis.label] || actionChecklist.ABSTAIN;
+  stopAction.textContent = checklist.stop;
+  nextAction.textContent = checklist.next;
   document.querySelector("#disclaimer").textContent = analysis.disclaimer;
   renderList(document.querySelector("#evidence"), analysis.evidence, "evidence-chip", true);
   renderList(document.querySelector("#reasons"), analysis.reason_codes, "reason-chip");

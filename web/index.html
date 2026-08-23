@@ -13,6 +13,7 @@
       <header class="topbar">
         <div class="brand"><span class="brand-mark">F</span><span>FinGuard</span></div>
         <div class="topbar-meta"><span class="live-dot"></span> LOCAL DEMO <span class="divider">·</span> rules-v0.1-demo</div>
+        <a class="pitch-link" href="/pitch">발표 모드 <span>↗</span></a>
       </header>
 
       <section class="hero">
@@ -52,7 +53,7 @@
           <div id="empty-state" class="empty-state">
             <div class="empty-icon">↗</div>
             <p>왼쪽에 메시지를 붙여넣고<br />분석 버튼을 눌러보세요.</p>
-            <small>이 데모는 안전하다고 확정하지 않습니다.</small>
+            <small>결과는 판정이 아니라 안전한 다음 행동을 위한 신호입니다.</small>
           </div>
           <div id="result-body" class="result-body hidden">
             <div class="score-row">
@@ -61,8 +62,12 @@
               <div class="score-block"><span>신뢰도</span><strong id="confidence">0.00</strong></div>
             </div>
             <div class="action-callout">
-              <div class="callout-kicker">지금 할 행동</div>
+              <div class="callout-kicker">ACTION GATE / 지금 할 행동</div>
               <div id="safe-action" class="safe-action"></div>
+              <div class="action-checklist">
+                <div><span>하지 말 것</span><p id="stop-action">—</p></div>
+                <div><span>지금 할 것</span><p id="next-action">—</p></div>
+              </div>
             </div>
             <div class="evidence-section">
               <div class="section-label">근거 문장 / 신호</div>

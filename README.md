@@ -21,7 +21,12 @@ python3 -m app.server --port 8765
 
 브라우저에서 [http://127.0.0.1:8765](http://127.0.0.1:8765)를 엽니다.
 
-오늘 회의에서는 입력창 아래의 데모 케이스를 차례대로 누른 뒤, 마지막에 팀원이 직접 문장을 입력합니다. 상세 대본은 [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)에 있습니다.
+오늘 회의의 기본 화면은 발표 모드입니다.
+
+- 발표용 스크롤 프레젠테이션: [http://127.0.0.1:8765/pitch](http://127.0.0.1:8765/pitch)
+- 실제 서비스 thin slice: [http://127.0.0.1:8765/](http://127.0.0.1:8765/)
+
+발표 모드에서 `90초 데모 시작`을 누르면 기관 사칭, 입력 공격, 원격제어, 투자, 중고거래, 낮은 위험/비증명 케이스가 순서대로 재생됩니다. 마지막에는 팀원이 가져온 아이디어 이름을 입력해 같은 기준으로 비교할 수 있습니다. 상세 대본은 [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md)에 있습니다.
 
 ## AI-DLC 자문 호출 — Claude Bedrock
 
@@ -54,7 +59,9 @@ python3 -m compileall -q app
 ```text
 app/analyzer.py          deterministic rules + stable result contract
 app/server.py            stdlib HTTP API and static file server
-web/                     meeting demo UI
+web/index.html           direct service thin slice
+web/pitch.html           scrollable meeting presentation mode
+web/                     meeting demo UI and presentation assets
 tests/                   unittest contract and behavior tests
 docs/                    product, API, safety, and meeting materials
 ```
