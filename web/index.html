@@ -3,111 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="FinGuard 금융 대화 안전 게이트 로컬 데모" />
-    <title>FinGuard · 금융 대화 안전 게이트</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <meta name="description" content="FinGuard 금융 대화 안전 게이트 · Figma 화면 구현 프론트" />
+    <title>FinGuard — Wireframe v1</title>
+    <link rel="stylesheet" href="/styles.css?v=front-20260830-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <main class="shell">
-      <header class="topbar">
-        <div class="brand"><span class="brand-mark">F</span><span>FinGuard</span></div>
-        <div class="topbar-meta"><span class="live-dot"></span> LOCAL DEMO <span class="divider">·</span> rules-v0.1-demo</div>
-        <a class="pitch-link" href="/pitch">서비스 제안서 <span>↗</span></a>
-      </header>
-
-      <section class="hero">
-        <div class="eyebrow">FINANCIAL CONVERSATION SAFETY GATE</div>
-        <h1>행동하기 전에,<br /><span>한 번 멈춰보세요.</span></h1>
-        <p>문자·스크린샷·결제 링크를 공유하면 위험 신호, 근거 문장,<br class="desktop-only" /> 지금 멈출 행동과 공식 확인 경로를 보여줍니다.</p>
-        <div class="hero-context" aria-label="첫 서비스 가설">
-          <div class="hero-context-card"><span>WHO</span><strong>금융 사기 문자를 받은 사람</strong><small>대신 확인하는 가족·보호자까지</small></div>
-          <div class="hero-context-card"><span>WHEN</span><strong>송금·인증·클릭 30초 전</strong><small>행동 직전의 짧은 멈춤</small></div>
-          <div class="hero-context-card"><span>HOW</span><strong>공유 · 스크린샷 · 링크</strong><small>붙여넣기는 마지막 fallback</small></div>
-        </div>
-      </section>
-
-      <section class="workspace" aria-label="대화 분석">
-        <div class="input-panel panel">
-          <div class="panel-heading">
-            <div>
-              <div class="section-kicker">01 / ENTRY</div>
-              <h2 id="input-title">공유받은 내용 확인</h2>
-            </div>
-            <span class="privacy-badge">입력 내용 저장 안 함</span>
-          </div>
-          <div class="entry-chooser" aria-label="FinGuard 진입 경로">
-            <div class="section-label">진입 경로</div>
-            <div class="entry-options" role="group" aria-label="분석할 입력의 출처">
-              <button class="entry-option is-active" type="button" data-entry-mode="share" aria-pressed="true"><strong>공유받은 문자</strong><small>SMS · 메신저</small></button>
-              <button class="entry-option" type="button" data-entry-mode="screenshot" aria-pressed="false"><strong>스크린샷</strong><small>화면 캡처</small></button>
-              <button class="entry-option" type="button" data-entry-mode="link" aria-pressed="false"><strong>결제 링크</strong><small>중고거래 · DM</small></button>
-            </div>
-            <p id="entry-mode-note" class="entry-mode-note" aria-live="polite">문자나 카카오톡에서 FinGuard로 공유받은 상황을 재현합니다.</p>
-          </div>
-          <div id="screenshot-picker" class="screenshot-picker hidden">
-            <label class="screenshot-label" for="screenshot-input">화면 캡처 선택</label>
-            <input id="screenshot-input" class="screenshot-input" type="file" accept="image/*" />
-            <p id="screenshot-state" class="screenshot-state">이미지는 서버로 보내지 않습니다. 데모에서는 OCR 결과를 아래 입력창에 넣습니다.</p>
-            <img id="screenshot-preview" class="screenshot-preview hidden" alt="선택한 금융 대화 스크린샷 미리보기" />
-          </div>
-          <label class="message-label" for="message"><span id="message-label-text">공유받은 문장</span><small>텍스트 fallback</small></label>
-          <textarea id="message" maxlength="12000" aria-describedby="entry-mode-note screenshot-state" placeholder="예: 금융감독원입니다. 계좌가 범죄에 연루됐으니 지금 안전계좌로 이체하세요."></textarea>
-          <div class="input-footer">
-            <span id="char-count">0 / 12,000</span>
-            <button id="analyze" class="primary-button">안전 분석하기 <span>→</span></button>
-          </div>
-          <div class="demo-row">
-            <span class="demo-label">상황 바로 보기</span>
-            <div id="demo-cases" class="demo-cases"></div>
-          </div>
-        </div>
-
-        <div id="result-panel" class="result-panel panel is-empty" aria-live="polite">
-          <div class="panel-heading">
-            <div>
-              <div class="section-kicker">02 / OUTPUT</div>
-              <h2 id="result-title">분석 결과가 여기에 표시됩니다</h2>
-            </div>
-            <div id="result-label" class="result-label">READY</div>
-          </div>
-          <div id="empty-state" class="empty-state">
-            <div class="empty-icon">↗</div>
-            <p>받은 내용의 진입 경로를 고르고<br />안전 분석을 눌러보세요.</p>
-            <small>결과는 판정이 아니라 안전한 다음 행동을 위한 신호입니다.</small>
-          </div>
-          <div id="result-body" class="result-body hidden">
-            <div class="score-row">
-              <div class="score-block"><span>위험 점수</span><strong id="risk-score">0.00</strong></div>
-              <div class="score-block"><span>프롬프트 공격</span><strong id="injection-score">0.00</strong></div>
-              <div class="score-block"><span>신뢰도</span><strong id="confidence">0.00</strong></div>
-            </div>
-            <div class="action-callout">
-              <div class="callout-kicker">ACTION GATE / 지금 할 행동</div>
-              <div id="safe-action" class="safe-action"></div>
-              <div class="action-checklist">
-                <div><span>하지 말 것</span><p id="stop-action">—</p></div>
-                <div><span>지금 할 것</span><p id="next-action">—</p></div>
-              </div>
-            </div>
-            <div class="evidence-section">
-              <div class="section-label">근거 문장 / 신호</div>
-              <div id="evidence" class="evidence-list"></div>
-            </div>
-            <div class="reason-section">
-              <div class="section-label">탐지된 패턴</div>
-              <div id="reasons" class="reason-list"></div>
-            </div>
-            <div id="disclaimer" class="disclaimer"></div>
-          </div>
-        </div>
-      </section>
-
-      <footer class="footer">
-        <span>FinGuard는 금융 행동을 대신하지 않습니다. 공식 채널에서 직접 확인하세요.</span>
-        <span>Python ≥ 3.12 · local-only · no external URL fetch</span>
-      </footer>
-    </main>
-    <script src="/app.js"></script>
+    <main id="app-main" class="prototype-root" tabindex="-1"></main>
+    <script src="/app.js?v=front-20260830-8"></script>
   </body>
 </html>

@@ -60,11 +60,33 @@ class ServerContractTests(unittest.TestCase):
 
     def test_service_exposes_low_friction_entry_paths(self) -> None:
         index_html = (WEB_ROOT / "index.html").read_text(encoding="utf-8")
-        for mode in ("share", "screenshot", "link"):
-            self.assertIn(f'data-entry-mode="{mode}"', index_html)
-        self.assertIn('id="screenshot-input"', index_html)
-        self.assertIn("공유받은 문자", index_html)
-        self.assertIn("결제 링크", index_html)
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        self.assertIn('id="app-main"', index_html)
+        self.assertIn('class="prototype-root"', index_html)
+        for screen in ("s00", "g01", "g02", "g03", "workspace", "reviewer", "components"):
+            self.assertIn(f'"{screen}"', app_js)
+        self.assertIn("figma-mobile-screen", app_js)
+        self.assertIn("figma-desktop-frame", app_js)
+
+    def test_service_exposes_optional_consent_flow_without_storage_claim(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        for marker in (
+            "동의하고 사건 생성",
+            "아니요, 보류",
+            '"create-case"',
+            '"hold-consent"',
+        ):
+            self.assertIn(marker, app_js)
+        self.assertIn("실제 사건 생성·저장은 실행하지 않는 mock 흐름입니다", app_js)
+
+    def test_frontend_covers_the_figma_screen_map(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        for screen in ("C01", "C02", "C03", "C04", "C05A", "C05B", "C06", "C07", "C08"):
+            self.assertIn(f'"{screen}"', app_js)
+        for screen in ("R01", "R02A", "R02B", "R03", "R04", "R04B", "R05", "R06"):
+            self.assertIn(f'"{screen}"', app_js)
+        for state in ("DANGER", "LOW_RISK_NOT_PROOF", "ABSTAIN", "INJECTION_DETECTED"):
+            self.assertIn(state, app_js)
 
 
 if __name__ == "__main__":
