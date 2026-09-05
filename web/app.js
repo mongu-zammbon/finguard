@@ -32,11 +32,17 @@ const state = {
   selectedFact: "F-001",
   reviewSubmitted: false,
   beforeNotice: "",
-  beforeInputMode: "screenshot",
+  beforeInputMode: "direct",
   beforeText: "",
   beforeFileName: "",
   beforeFile: null,
   beforeAnalysis: null,
+  afterStep: 0,
+  afterNotice: "",
+  shieldStep: 0,
+  shieldView: "s01",
+  showReference: false,
+  gateAnalysis: null,
 };
 
 const ENTRY_MODES = {
@@ -135,6 +141,20 @@ const RESULT_STATES = {
     ],
     reasons: ["institution_impersonation", "threat", "transfer", "urgency", "secrecy"],
   },
+  CAUTION: {
+    label: "CAUTION",
+    tone: COLORS.warning,
+    title: "추가 확인 전까지 행동을 보류하세요",
+    summary: "주의 신호가 있지만 현재 정보만으로 위험을 확정할 수 없습니다.",
+    safeAction: "메시지 속 링크·번호를 사용하지 말고 공식 채널에서 확인하세요.",
+    stop: "추가 송금·인증·링크 클릭을 잠시 멈추세요.",
+    next: "은행 앱이나 공식 대표번호로 발신자와 요청을 독립적으로 확인하세요.",
+    risk: "0.55",
+    injection: "0.00",
+    confidence: "0.58",
+    evidence: [],
+    reasons: ["caution_signal", "independent_verification_needed"],
+  },
   LOW_RISK_NOT_PROOF: {
     label: "LOW_RISK_NOT_PROOF",
     tone: COLORS.success,
@@ -205,7 +225,7 @@ const LANDING_NAV_ITEMS = [
 const PROTOTYPE_NAV_ITEMS = [
   { id: "home", label: "홈", screen: "home", flow: "default" },
   { id: "before", label: "행동 전", screen: "before", flow: "before" },
-  { id: "after-transfer", label: "송금 직후", screen: "workspace", flow: "transfer" },
+  { id: "after-transfer", label: "송금 직후", screen: "after", flow: "transfer" },
   { id: "after-freeze", label: "계좌 정지 후", screen: "s00", flow: "freeze" },
 ];
 
@@ -228,7 +248,7 @@ const LANDING_STAGES = [
     description: "72시간 동안 신고·지급정지·\n증거 보존의 순서를 정리합니다.",
     mobileDescription: "72시간 동안 신고·지급정지·\n증거 보존의 순서를 정리합니다.",
     action: "초기 대응 순서 보기",
-    target: "workspace",
+    target: "after",
     flow: "transfer",
     tone: "orange",
   },
@@ -242,6 +262,57 @@ const LANDING_STAGES = [
     target: "s00",
     flow: "freeze",
     tone: "green",
+  },
+];
+
+const AFTER_STEPS = [
+  {
+    kicker: "AFTER · 송금 직후",
+    title: "지금부터 72시간을\n지켜주세요",
+    intro: "이미 돈을 보냈다면 추가 행동을 줄이고\n공식 확인과 증거 보존부터 시작합니다.",
+    badge: "STOP",
+    calloutTitle: "추가 송금·연락을 멈추세요",
+    calloutCopy: "상대방의 환급·해제·합의 요구에 바로 응답하지 말고, 은행과 공식 기관에 직접 확인하세요.",
+  },
+  {
+    kicker: "AFTER · 01–30분",
+    title: "먼저 지급정지와\n증거 보존",
+    intro: "순서를 지키면 추가 피해와\n나중의 설명 누락을 줄일 수 있습니다.",
+    badge: "ORDER",
+    calloutTitle: "공식 채널부터 연결하세요",
+    calloutCopy: "은행 앱·대표번호로 지급정지 가능 여부를 확인하고, 거래·대화·전화 기록을 지우지 마세요.",
+  },
+  {
+    kicker: "AFTER · 72시간 계획",
+    title: "증거를 묶고\n공식 도움으로 연결",
+    intro: "지금의 기록이 이후 FROZEN 소명과\n신고·상담의 출발점이 됩니다.",
+    badge: "HANDOFF",
+    calloutTitle: "사건 기록을 하나로 남기세요",
+    calloutCopy: "송금 시각·금액·상대방·대화 원문을 묶어두고, 계좌가 막히면 FROZEN에서 소명팩으로 이어갑니다.",
+  },
+];
+
+const SHIELD_STEPS = [
+  {
+    kicker: "SHIELD · 불법 추심 대응",
+    title: "반복 연락과 협박을\n기록하세요",
+    intro: "연락 원문과 시각을 남기고,\n공식 상담에 가져갈 자료를 준비합니다.",
+    calloutTitle: "압박을 받으면 확인·안전 확보부터",
+    calloutCopy: "위협·반복 연락·가족이나 직장에 알리겠다는 말은 답변보다 기록과 안전 확보가 먼저입니다.",
+  },
+  {
+    kicker: "SHIELD · 연락 기록",
+    title: "연락을 증거로\n남겨두세요",
+    intro: "발신자·시각·채널·요구 내용을\n한 번에 확인할 수 있게 묶습니다.",
+    calloutTitle: "기록할 4가지",
+    calloutCopy: "전화번호·연락 시각 · 원문·녹취/스크린샷 · 요구한 금액과 기한",
+  },
+  {
+    kicker: "SHIELD · 안전한 다음 행동",
+    title: "기록을 정리하고,\n공식 도움을 받으세요",
+    intro: "직접 답변해야 한다는 뜻은 아닙니다.\n안전과 상황에 맞는 공식 상담을 우선합니다.",
+    calloutTitle: "공식 상담·신고용 패키지",
+    calloutCopy: "연락 기록과 거래 자료를 묶어 상담기관·수사기관에 전달할 준비를 합니다.",
   },
 ];
 
@@ -491,7 +562,15 @@ function beforeTextEvidence(text) {
 
 function createBeforeTextAnalysis(text) {
   const label = mockAnalyze(text);
-  return { label, source: "text", evidence: beforeTextEvidence(text), inputLength: text.length };
+  return {
+    label,
+    source: "text",
+    evidence: beforeTextEvidence(text),
+    inputLength: text.length,
+    modelVersion: "client-fallback-v0.1-demo",
+    disclaimer: "분석 서버 미연결 시 사용하는 브라우저 예비 규칙입니다. 안전을 확정하지 않습니다.",
+    runtimeNotice: "분석 서버 미연결 · 브라우저 예비 규칙으로 결과를 표시했습니다. 발표 전 /healthz를 확인하세요.",
+  };
 }
 
 function createBeforeFileAnalysis(file) {
@@ -505,6 +584,53 @@ function createBeforeFileAnalysis(file) {
       { label: "비공식 경로", value: "메시지 번호·링크로\n바로 행동을 유도" },
     ],
   };
+}
+
+const BEFORE_CATEGORY_LABELS = {
+  transfer: "금전 요구",
+  family_impersonation: "가족·지인 사칭",
+  urgency: "시간 압박",
+  secrecy: "비밀 요구",
+  institution_impersonation: "기관 사칭",
+  credential_theft: "인증정보 요구",
+  threat: "위협·압박",
+  remote_control: "원격제어 요구",
+  investment_scam: "투자 수익 보장",
+  prompt_injection: "입력 지시문",
+  phishing_link: "비공식 링크",
+};
+
+function normalizeBackendAnalysis(result, text) {
+  const label = result?.label === "INJECTION" ? "INJECTION_DETECTED" : result?.label || "ABSTAIN";
+  const evidence = Array.isArray(result?.evidence)
+    ? result.evidence.slice(0, 4).map((item) => ({
+      label: BEFORE_CATEGORY_LABELS[item.category] || "관찰된 신호",
+      value: item.text ? "“" + item.text + "”" : "원문에서 관련 신호를 확인",
+    }))
+    : [];
+  return {
+    label,
+    source: "text",
+    evidence: evidence.length ? evidence : beforeTextEvidence(text),
+    inputLength: text.length,
+    riskScore: result?.risk_score,
+    confidence: result?.confidence,
+    modelVersion: result?.model_version,
+    disclaimer: result?.disclaimer,
+    runtimeNotice: "",
+  };
+}
+
+async function requestBackendAnalysis(text) {
+  const response = await fetch("/v1/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+  if (!response.ok) throw new Error("analysis_" + response.status);
+  const payload = await response.json();
+  if (!payload.analysis) throw new Error("analysis_missing");
+  return payload.analysis;
 }
 
 function beforeResultPresentation(analysis) {
@@ -550,7 +676,7 @@ function beforeResultPresentation(analysis) {
 }
 
 function resetBeforeFlow() {
-  state.beforeInputMode = "screenshot";
+  state.beforeInputMode = "direct";
   state.beforeText = "";
   state.beforeFileName = "";
   state.beforeFile = null;
@@ -558,7 +684,7 @@ function resetBeforeFlow() {
   state.beforeNotice = "";
 }
 
-function runBeforeAnalysis() {
+async function runBeforeAnalysis() {
   if (state.busy) return;
   const text = state.beforeInputMode === "direct" ? state.beforeText.trim() : "";
   const file = state.beforeInputMode === "screenshot" ? state.beforeFile : null;
@@ -567,23 +693,164 @@ function runBeforeAnalysis() {
     render();
     return;
   }
+  if (file && !text) {
+    state.beforeNotice = "현재 MVP는 이미지 OCR 연동 전 단계입니다. 직접 입력 탭에 메시지 원문을 붙여넣어 주세요.";
+    render();
+    return;
+  }
 
   state.busy = true;
   state.beforeNotice = "";
   render();
-  window.setTimeout(() => {
-    state.beforeAnalysis = file ? createBeforeFileAnalysis(file) : createBeforeTextAnalysis(text);
+  try {
+    const analysis = await requestBackendAnalysis(text);
+    state.beforeAnalysis = normalizeBackendAnalysis(analysis, text);
     state.variant = state.beforeAnalysis.label;
     state.busy = false;
     navigate("before-result");
-  }, 180);
+  } catch (error) {
+    state.beforeAnalysis = createBeforeTextAnalysis(text);
+    state.variant = state.beforeAnalysis.label;
+    state.busy = false;
+    state.beforeNotice = "";
+    navigate("before-result");
+  }
+}
+
+function resetAfterFlow() {
+  state.afterStep = 0;
+  state.afterNotice = "";
+}
+
+function resetShieldFlow() {
+  state.shieldStep = 0;
+}
+
+function flowProgress(total, active, className) {
+  const progress = el("div", className);
+  for (let index = 0; index < total; index += 1) {
+    progress.append(el("span", index === active ? "is-active" : ""));
+  }
+  return progress;
+}
+
+function flowChecklist(items, className = "after-checklist") {
+  const list = el("ul", className);
+  items.forEach(([title, description]) => {
+    const item = el("li", "after-checklist-item");
+    append(item, el("span", "after-check-icon", "✓"), el("div", "after-check-copy", el("strong", "", title), el("span", "", description)));
+    list.append(item);
+  });
+  return list;
+}
+
+function renderAfterFlow() {
+  const index = Math.max(0, Math.min(AFTER_STEPS.length - 1, state.afterStep));
+  const step = AFTER_STEPS[index];
+  const body = el("div", "figma-screen-content after-flow-content");
+  append(
+    body,
+    el("span", "after-flow-kicker", step.kicker),
+    el("h1", "after-flow-title", step.title),
+    el("p", "after-flow-intro", step.intro),
+    flowProgress(AFTER_STEPS.length, index, "after-flow-progress"),
+    figmaCallout(step.badge, step.calloutTitle + " · " + step.calloutCopy, index === 0 ? "danger" : "warning"),
+  );
+
+  if (index === 0) {
+    body.append(
+      el("div", "after-timer", el("strong", "", "72시간"), el("span", "", "추가 피해를 줄이고 공식 확인을 이어가는 시간")),
+      flowChecklist([
+        ["추가 송금하지 않기", "환급·해제 비용 요구에도 멈춥니다."],
+        ["메시지 속 연락처 쓰지 않기", "은행 앱이나 공식 대표번호를 직접 엽니다."],
+        ["대화·거래 기록 보존하기", "삭제·편집·재전송을 하지 않습니다."],
+      ]),
+    );
+  } else if (index === 1) {
+    body.append(
+      flowChecklist([
+        ["은행 공식 채널에 연락", "송금 시각·금액·상대 계좌를 바로 확인합니다."],
+        ["지급정지 가능 여부 확인", "상담 접수번호와 담당 부서를 기록합니다."],
+        ["증거 원본 보관", "문자·메신저·통화·거래 내역을 한 폴더에 둡니다."],
+      ]),
+      figmaCallout("기록 원칙", "원문과 파일은 원본 그대로 남기고, 설명이나 추정은 별도 메모로 구분하세요.", "info"),
+    );
+  } else {
+    body.append(
+      flowChecklist([
+        ["사건의 핵심 사실", "언제·얼마를·누구에게·어떤 경로로 보냈는지"],
+        ["연결할 원문", "상대방 메시지·프로필·통화·링크·파일"],
+        ["다음 공식 행동", "은행·상담기관·수사기관에 확인할 질문"],
+      ]),
+      figmaCallout("다음 연결", "계좌가 막혔다면 FROZEN에서 거래·대화·문서를 연결해 소명팩으로 이어갑니다.", "info"),
+    );
+  }
+
+  const actions = el("div", "figma-mobile-actions after-flow-actions");
+  if (index < AFTER_STEPS.length - 1) {
+    actions.append(figmaPrimary(index === 0 ? "72시간 계획 보기" : "증거 보존 다음 단계", "after-next"));
+  } else {
+    actions.append(screenButton("FROZEN 소명 시작하기", "s00", "button figma-primary", {
+      "data-entry-flow": "freeze",
+    }));
+    actions.append(screenButton("불법 추심이 계속되면 SHIELD 보기", "shield", "button figma-secondary"));
+  }
+  if (index > 0) actions.append(actionButton("이전 단계", "after-back", "button figma-secondary"));
+  else actions.append(screenButton("홈으로 돌아가기", "home", "button figma-secondary"));
+  body.append(actions);
+  if (state.afterNotice) body.append(el("p", "after-flow-notice", state.afterNotice));
+  return figmaMobileFrame("AFTER · " + (index + 1) + "/3", body, "after-mobile");
+}
+
+function renderShieldFlow() {
+  const index = Math.max(0, Math.min(SHIELD_STEPS.length - 1, state.shieldStep));
+  const step = SHIELD_STEPS[index];
+  const body = el("div", "figma-screen-content shield-flow-content");
+  append(
+    body,
+    el("span", "shield-flow-kicker", step.kicker),
+    el("h1", "shield-flow-title", step.title),
+    el("p", "shield-flow-intro", step.intro),
+    flowProgress(SHIELD_STEPS.length, index, "shield-flow-progress"),
+    figmaCallout(index === 0 ? "STOP" : "RECORD", step.calloutTitle + " · " + step.calloutCopy, index === 0 ? "danger" : "info"),
+  );
+  if (index === 0) {
+    body.append(flowChecklist([
+      ["안전 확보", "직접적인 신체 위협 등 긴급 상황이면 안전 확보와 112 신고가 우선입니다."],
+      ["연락 기록", "번호·시각·채널·요구 내용을 바로 적습니다."],
+      ["압박에 따른 추가 송금 보류", "연락을 멈추는 조건의 추가 금전 요구는 먼저 확인하세요. 채무의 존재·금액 판단과는 별개입니다."],
+    ], "shield-checklist"));
+  } else if (index === 1) {
+    body.append(flowChecklist([
+      ["발신자·시각", "전화번호와 연락이 온 시간을 남깁니다."],
+      ["원문·파일", "문자·메신저·녹취·스크린샷을 원본으로 보관합니다."],
+      ["요구 내용", "금액·기한·협박·가족/직장 언급을 분리합니다."],
+    ], "shield-checklist"));
+  } else {
+    body.append(figmaCallout("상담에서 확인할 것", "연락 방식의 문제와 채무의 존재·금액을 분리해 확인하세요. FinGuard는 불법 여부를 확정하지 않습니다.", "info"));
+    body.append(flowChecklist([
+      ["협상하지 않기", "감정적인 설명이나 개인정보를 더 주지 않습니다."],
+      ["공식 상담·신고", "기록을 묶어 적절한 공식 창구에 전달합니다."],
+      ["FROZEN 연결", "계좌가 막힌 사건은 소명팩 흐름으로 이어갑니다."],
+    ], "shield-checklist"));
+  }
+
+  const actions = el("div", "figma-mobile-actions shield-flow-actions");
+  actions.append(recordAction(index === 2 ? "상담 준비 자료 만들기" : "연락 한 건 기록하기", "record-open", "shield", { "data-record-view": index === 2 ? "s07" : "s02" }, true));
+  if (index < SHIELD_STEPS.length - 1) actions.append(actionButton("대응 안내 계속 보기", "shield-next", "button figma-secondary"));
+  else actions.append(screenButton("계좌도 막혔다면 소명 준비", "s00", "button figma-secondary", { "data-entry-flow": "freeze" }));
+  if (index === 0) actions.append(recordAction("합성 연락 3건으로 체험", "record-demo", "shield"));
+  if (index > 0) actions.append(actionButton("이전 단계", "shield-back", "button figma-secondary"));
+  else actions.append(screenButton("홈으로 돌아가기", "home", "button figma-secondary"));
+  body.append(actions);
+  return figmaMobileFrame("SHIELD · " + (index + 1) + "/3", body, "shield-mobile");
 }
 
 function parseHash() {
   const raw = window.location.hash.replace(/^#/, "");
   if (!raw) return;
   const [screen, value] = raw.split("/");
-  if (["home", "overview", "s00", "g01", "g02", "g03", "before", "before-result", "workspace", "c01", "c02", "c03", "c04", "c05a", "c05b", "c06", "c07", "c08", "reviewer", "components"].includes(screen)) {
+  if (["home", "overview", "s00", "g01", "g02", "g03", "before", "before-result", "after", "shield", "shield-workspace", "workspace", "c01", "c02", "c03", "c04", "c05a", "c05b", "c06", "c07", "c08", "reviewer", "components"].includes(screen)) {
     state.screen = screen;
   }
   if (screen === "before" || screen === "before-result") state.entryFlow = "before";
@@ -595,6 +862,9 @@ function parseHash() {
   if (screen === "g02" && RESULT_STATES[value]) state.variant = value;
   if (screen === "g01" && value === "DIRECT_INPUT") state.entryMode = "direct";
   if (screen === "g01" && value !== "DIRECT_INPUT") state.entryMode = "screenshot";
+  if (screen === "after" && value) state.afterStep = Math.max(0, Math.min(AFTER_STEPS.length - 1, Number(value) || 0));
+  if (screen === "shield" && value) state.shieldStep = Math.max(0, Math.min(SHIELD_STEPS.length - 1, Number(value) || 0));
+  if (screen === "shield-workspace" && SHIELD_VIEWS.some(([id]) => id === value)) state.shieldView = value;
   if (screen === "workspace" && CASE_SCREENS.some(([id]) => id === value)) state.workspaceScreen = value;
   if (screen === "reviewer" && REVIEW_SCREENS.some(([id]) => id === value)) state.reviewScreen = value;
 }
@@ -603,6 +873,9 @@ function writeHash() {
   let value = state.screen;
   if (state.screen === "g02") value += `/${state.variant}`;
   if (state.screen === "g01" && state.entryMode === "direct") value += "/DIRECT_INPUT";
+  if (state.screen === "after" && state.afterStep > 0) value += "/" + state.afterStep;
+  if (state.screen === "shield" && state.shieldStep > 0) value += "/" + state.shieldStep;
+  if (state.screen === "shield-workspace") value += "/" + state.shieldView;
   if (state.screen === "workspace" && state.workspaceScreen !== "c01") value += `/${state.workspaceScreen}`;
   if (state.screen === "reviewer") value += `/${state.reviewScreen}`;
   window.history.replaceState(null, "", `#${value}`);
@@ -1041,6 +1314,15 @@ function renderWorkspace() {
   const toolbar = el("div", "workspace-toolbar");
   append(toolbar, el("div", "workspace-breadcrumb", badge("CASE", COLORS.danger), el("strong", "", "FG-2026-001"), el("span", "", "· 사람 확인 필요")), screenButton("모바일 C01", "c01", "button button-ghost"), screenButton("모바일 C03", "c03", "button button-ghost"));
   page.append(toolbar);
+  const handoff = el("section", "workspace-handoff-banner");
+  const fromAfter = state.entryFlow === "transfer";
+  append(
+    handoff,
+    badge(fromAfter ? "AFTER → FROZEN" : "FROZEN · CORE", fromAfter ? COLORS.warning : COLORS.info),
+    el("strong", "", fromAfter ? "송금 직후 기록이 연결된 사건" : "계좌가 막힌 후 소명 준비"),
+    el("p", "", fromAfter ? "72시간 대응에서 남긴 거래·대화·문서를 이 사건의 원문과 함께 검토합니다." : "거래·대화·문서를 연결해 금융회사가 검토할 소명팩을 준비합니다."),
+  );
+  page.append(handoff);
   const layout = el("div", "desktop-workspace");
   const side = el("aside", "workspace-side");
   append(side, el("span", "workspace-side-kicker", "CASE WORKSPACE"), el("h2", "", "FG-2026-001"), el("p", "", "기관 사칭 + 이체 요구"), divider());
@@ -1427,7 +1709,7 @@ function landingNavItem(item) {
   if (item.type === "scroll") {
     return actionButton(item.label, "scroll-home", className, { "data-scroll-target": item.target });
   }
-  return screenButton(item.label, item.target, className, { "aria-current": active ? "page" : undefined, "data-entry-flow": item.target === "s00" ? "default" : undefined });
+  return screenButton(item.label, item.target, className, { "aria-current": active ? "page" : undefined, "data-entry-flow": item.target === "s00" ? "freeze" : undefined });
 }
 
 function landingNavigation() {
@@ -1462,9 +1744,9 @@ function prototypeNavRouteIsActive(route) {
   if (route === "home") return state.screen === "home";
   if (route === "before") return ["before", "before-result"].includes(state.screen);
   if (route === "after-transfer") {
-    return (state.screen === "workspace" || CASE_SCREENS.some(([id]) => id === state.screen)) && state.entryFlow === "transfer";
+    return state.screen === "after" || ((state.screen === "workspace" || CASE_SCREENS.some(([id]) => id === state.screen)) && state.entryFlow === "transfer");
   }
-  if (route === "after-freeze") return ["s00", "g01", "g02", "g03"].includes(state.screen) && state.entryFlow === "freeze";
+  if (route === "after-freeze") return ["s00", "g01", "g02", "g03", "workspace", ...CASE_SCREENS.map(([id]) => id)].includes(state.screen) && state.entryFlow === "freeze";
   return false;
 }
 
@@ -1495,10 +1777,10 @@ function prototypeNavigation() {
 }
 
 function landingStageCard(stage) {
-  const card = setAttrs(el("article", `landing-stage-card landing-stage-${stage.tone}`), { id: stage.id });
+  const card = setAttrs(el("article", `landing-stage-card landing-stage-${stage.tone} ${stage.featured ? "landing-stage-featured" : ""}`.trim()), { id: stage.id });
   const description = el("p", "landing-stage-description");
   append(description, el("span", "landing-copy-desktop", stage.description), el("span", "landing-copy-mobile", stage.mobileDescription || stage.description));
-  append(card, el("span", "landing-stage-badge", stage.badge), el("h3", "landing-stage-title", stage.title), description, screenButton(stage.action, stage.target, "landing-stage-action", { "data-entry-flow": stage.flow }));
+  append(card, stage.featured ? el("span", "landing-stage-priority", "MVP 주인공") : null, el("span", "landing-stage-badge", stage.badge), el("h3", "landing-stage-title", stage.title), description, screenButton(stage.action, stage.target, "landing-stage-action", { "data-entry-flow": stage.flow }));
   return card;
 }
 
@@ -1573,7 +1855,13 @@ function renderLandingPage() {
     append(card, el("span", "landing-boundary-icon", icon), el("strong", "landing-boundary-card-title", title), el("p", "landing-boundary-card-description", description), el("span", "landing-boundary-mobile-copy", `${icon} ${description.split(" · 공식 다음 행동")[0]}`));
     boundaryGrid.append(card);
   });
-  boundaryInner.append(boundaryGrid);
+  const shieldEntry = el("article", "landing-shield-entry");
+  append(
+    shieldEntry,
+    el("div", "landing-shield-copy", el("span", "landing-shield-kicker", "SHIELD · 불법 추심 대응"), el("strong", "", "불법 추심 대응도 같은 기록 구조로 연결합니다."), el("p", "", "반복 연락·협박·추가 송금 요구를 기록하고 공식 도움으로 이어집니다.")),
+    screenButton("불법 추심 대응 보기", "shield", "landing-shield-action"),
+  );
+  boundaryInner.append(boundaryGrid, shieldEntry);
   boundary.append(boundaryInner);
   main.append(boundary);
 
@@ -1636,24 +1924,27 @@ function renderActualG01() {
 function renderActualG02() {
   const result = FIGMA_RESULT_STATES[state.variant] || FIGMA_RESULT_STATES.DANGER;
   const body = el("div", "figma-screen-content figma-result-content");
-  body.append(figmaAlert(result.badge, result.title), figmaEvidenceList());
-  body.append(figmaCallout(result.stopTitle, result.stop, "danger"), figmaCallout(result.checkTitle, result.check, "info"));
+  const analysis = state.gateAnalysis;
+  const rows = (analysis?.evidence || []).map(item => [BEFORE_CATEGORY_LABELS[item.category] || "관찰된 표현", "“" + item.text + "”"]);
+  const title = state.variant === "CAUTION" ? "추가 행동 전 독립적인 확인이 필요합니다" : result.title;
+  body.append(figmaAlert("규칙 기반 점검 · " + state.variant, title), figmaEvidenceList(rows.length ? rows : [["확인할 근거", "현재 점검에서 표시할 근거가 없습니다. 안전하다는 뜻은 아닙니다."]]));
+  body.append(figmaCallout("원문에 대한 다음 행동", analysis?.safe_action || "원문과 요청을 공식 채널에서 직접 확인하세요.", "info"), figmaCallout(result.checkTitle, result.check, "info"));
   const actions = el("div", "figma-mobile-actions");
-  if (result.primaryAction === "open-consent") actions.append(figmaPrimary(result.primary, result.primaryAction));
-  else actions.append(screenButton(result.primary, result.primaryAction, "button figma-primary"));
+  actions.append(figmaPrimary("자료 정리 범위 확인", "open-consent"));
+  if (state.variant === "INJECTION_DETECTED" || state.variant === "ABSTAIN") actions.append(screenButton("입력 원문 다시 확인", "g01", "button figma-secondary"));
   actions.append(figmaSecondary("결과만 확인하고 종료", "s00"));
-  body.append(actions, el("p", "figma-bottom-note", result.footer));
+  body.append(actions, el("p", "figma-bottom-note", state.notice || "규칙 기반 점검은 사기·결백 여부를 확정하지 않습니다."));
   return figmaMobileFrame("1 / 7", body, "figma-gate-mobile figma-result-mobile");
 }
 
 function renderActualG03() {
   const body = el("div", "figma-screen-content figma-consent-content");
-  body.append(el("h1", "figma-screen-title", "이 메시지를 사건의\n첫 번째 증거로 전환할까요?"), el("p", "figma-screen-description", "빠른 확인 결과는 저장하지 않습니다. 사건 정리를 시작할 때 선택한 합성자료만 임시 저장합니다."));
+  body.append(el("h1", "figma-screen-title", "이 메시지를 사건의\n첫 번째 증거로 전환할까요?"), el("p", "figma-screen-description", "선택한 원문으로 이 탭에서 사건 정리를 시작합니다. 서버나 브라우저 저장소에는 보관하지 않습니다."));
   const evidence = el("section", "figma-consent-evidence");
-  append(evidence, figmaBadge("E-001", "figma-badge-blue"), el("strong", "", "협박성 금전 요구 메시지"), el("p", "", "Gate 분석 결과와 원문 근거를 사건 타임라인에 연결"));
+  append(evidence, figmaBadge("원문", "figma-badge-blue"), el("strong", "", "방금 점검한 메시지"), el("p", "", "입력 원문을 그대로 가져오고, 확인 내용과 수정 이력은 별도로 남깁니다."));
   body.append(evidence, el("h3", "figma-section-title", "보관 규칙 확인"));
   const checks = el("div", "figma-consent-list");
-  ["합성 또는 비식별 텍스트 자료만 사용합니다.", "사건 자료는 24시간 후 자동 삭제됩니다.", "담당자 화면에서 원본 근거를 확인할 수 있습니다."].forEach((label, index) => {
+  ["실제 개인정보 대신 합성 텍스트 자료만 사용합니다.", "새로고침하면 작업이 사라집니다. 필요한 자료는 먼저 내려받습니다.", "내려받을 내용과 원문은 직접 확인합니다. 기관에 자동 전송되지 않습니다."].forEach((label, index) => {
     const row = el("label", "figma-consent-item");
     const input = setAttrs(el("input"), { type: "checkbox", checked: state.consentItems[index + 1] === true, "data-consent-item": index + 1 });
     append(row, input, el("span", "", label));
@@ -1661,9 +1952,9 @@ function renderActualG03() {
   });
   body.append(checks);
   const summary = el("section", "figma-storage-summary");
-  append(summary, el("strong", "", "저장하는 것"), el("span", "", "선택한 합성 원문 · 추출 결과 · 수정 이력"), el("div", "figma-summary-divider"), el("strong", "", "하지 않는 것"), el("span", "", "실제 송금 · 계좌 조회 · 지급정지 해제"));
+  append(summary, el("strong", "", "이 탭에서 정리하는 것"), el("span", "", "선택한 합성 원문 · 확인 내용 · 수정 이력"), el("div", "figma-summary-divider"), el("strong", "", "하지 않는 것"), el("span", "", "서버 저장 · 자동 제출 · 지급정지 해제"));
   body.append(summary);
-  if (state.notice && state.notice.includes("세 가지")) body.append(el("p", "figma-error-message", state.notice));
+  if (state.notice) body.append(el("p", "figma-error-message", state.notice));
   const actions = el("div", "figma-mobile-actions");
   append(actions, figmaPrimary("위 규칙에 동의하고 사건 생성", "create-case"), figmaSecondary("동의하지 않고 나가기", "s00"));
   body.append(actions);
@@ -1671,6 +1962,15 @@ function renderActualG03() {
 }
 
 function renderActualC01Mobile() {
+  if (!state.showReference) {
+    const record = caseRecord("frozen");
+    const body = el("div", "figma-screen-content figma-case-content");
+    body.append(el("h1", "figma-screen-title", "사건 정리를\n시작했습니다"), el("p", "figma-screen-description", "원문을 추가하고, 직접 확인한 내용으로 소명팩을 준비합니다."));
+    body.append(figmaEvidenceList([["원문 자료", record.evidence.length + "건 연결"], ["확인할 항목", record.facts.length + "건 · 원문과 대조 필요"], ["보관 범위", "현재 탭에서만 작업"], ["최종 결과물", "선택한 원문과 확인 내용이 담긴 소명팩"]], "현재 사건"));
+    body.append(figmaCallout("작업 보관 안내", "서버에 저장하지 않습니다. 새로고침 전에 자료를 내려받아 주세요.", "info"));
+    body.append(el("div", "figma-mobile-actions", recordViewButton("자료 상태 확인", "frozen", "c02", true), recordViewButton("사건 개요 보기", "frozen", "c01")));
+    return figmaMobileFrame("사건 시작", body, "figma-case-mobile");
+  }
   const body = el("div", "figma-screen-content figma-case-content");
   body.append(figmaAlert("CASE", "사건 자료를 확인하세요"), figmaEvidenceList([
     ["금전 요구", "신고 취소를 조건으로 500,000원을 요구"],
@@ -1686,6 +1986,7 @@ function renderActualC01Mobile() {
 }
 
 function renderActualC03Mobile() {
+  if (!state.showReference) return renderRecordWorkspace("frozen", "c03");
   const body = el("div", "figma-screen-content figma-case-content");
   body.append(figmaAlert("AI 검토", "원문과 추출값을 비교하세요"), figmaEvidenceList([
     ["금전 요구", "신고 취소를 조건으로 500,000원을 요구"],
@@ -1812,7 +2113,7 @@ function renderBeforeCapture() {
   if (state.beforeInputMode === "screenshot") {
     const upload = el("label", "before-capture-upload");
     const input = setAttrs(el("input", "file-input"), { id: "before-screenshot-input", type: "file", accept: "image/*" });
-    append(upload, el("span", "before-capture-upload-icon", "↑"), el("strong", "", "문자·메시지 화면 업로드"), el("small", "", state.beforeFileName || "PNG · JPG · 최대 10MB"), input);
+    append(upload, el("span", "before-capture-upload-icon", "↑"), el("strong", "", "문자·메시지 화면 업로드"), el("small", "", state.beforeFileName || "PNG · JPG · 최대 10MB"), el("span", "before-capture-upload-note", "MVP 데모 · 이미지는 미리보기만, 분석은 텍스트 입력"), input);
     body.append(upload);
   } else {
     const input = setAttrs(el("textarea", "before-capture-direct-input"), { id: "before-message", maxlength: 8000, placeholder: "의심 메시지 내용을 붙여넣으세요.", "aria-label": "점검할 메시지" });
@@ -1839,6 +2140,17 @@ function renderBeforeResult() {
   const presentation = beforeResultPresentation(analysis);
   const body = el("div", "figma-screen-content before-result-content");
   append(body, el("div", `before-result-stop before-result-stop-${presentation.stopClass}`, presentation.stop), el("h1", "before-result-title", presentation.title), el("p", "before-result-intro", presentation.intro));
+
+  const analysisMeta = el("div", "before-result-meta");
+  const risk = Number.isFinite(Number(analysis.riskScore)) ? Number(analysis.riskScore).toFixed(2) : "—";
+  const confidence = Number.isFinite(Number(analysis.confidence)) ? Number(analysis.confidence).toFixed(2) : "—";
+  append(
+    analysisMeta,
+    el("span", "before-result-meta-item", `위험 ${risk}`),
+    el("span", "before-result-meta-item", `신뢰도 ${confidence}`),
+    el("span", "before-result-meta-item", analysis.modelVersion || "데모 규칙"),
+  );
+  body.append(analysisMeta);
 
   const evidence = el("section", "before-result-evidence");
   evidence.append(el("h2", "before-result-section-title", "메시지에서 확인된 근거"));
@@ -1881,6 +2193,7 @@ function renderBeforeResult() {
   }), actionButton("다른 메시지 점검하기", "before-capture", "button figma-secondary"));
   body.append(actions);
   if (analysis.source === "file") body.append(el("p", "before-result-source-note", `프론트 MVP 데모 · ${analysis.fileName}을 선택한 입력으로 처리했습니다. 실제 OCR 연동 전 단계입니다.`));
+  if (analysis.runtimeNotice) body.append(setAttrs(el("p", "before-result-runtime-note", analysis.runtimeNotice), { role: "status", "aria-live": "polite" }));
   body.append(el("p", "before-result-note", "위험 신호 참고용 · 최종 확인은 공식 채널과 상담으로 진행하세요."));
   return beforeMobileFrame("RESULT", body, "before-result-mobile");
 }
@@ -1893,6 +2206,7 @@ function figmaDesktopEvidence(label, value, source = "AI_EXTRACTED") {
 
 function renderActualC01Desktop() {
   const content = el("div", "figma-desktop-content");
+  content.append(figmaCallout("FROZEN · 계좌가 막힌 후", "거래·대화·문서를 한 사건에 연결해 소명팩을 준비합니다. 원본 고정 → 사실 확인 → 거래 연결 순서로 진행하세요.", "info"));
   content.append(figmaDesktopStats([["증거", "19", "원문·자료 연결", "info"], ["사실", "14", "AI 추출 11 · 확인 3", "success"], ["확인 필요", "03", "사람 검토 대기", "warning"], ["상충", "01", "Case B", "danger"]]));
   const grid = el("div", "figma-two-column");
   const summary = figmaDesktopSection("사건 요약", "Gate에서 보관 동의한 첫 번째 증거를 기준으로 정리합니다.");
@@ -2002,6 +2316,7 @@ function renderActualC06Desktop() {
 
 function renderActualC07Desktop() {
   const content = el("div", "figma-desktop-content");
+  content.append(figmaCallout("소명팩 준비 상태", "원본 19개·확인 사실 14개·상충 1개를 같은 사건으로 묶었습니다. 확인 필요 항목은 담당자 검토 후 확정합니다.", "success"));
   const layout = el("div", "figma-two-column figma-report-layout");
   const list = figmaDesktopSection("증거 인덱스", "최종 보고서에서 참조할 증거와 원문 위치입니다.");
   list.append(dataTable(["ID", "내용", "출처", "상태"], [["E-001", "최초 의심 메시지", "사용자 공유", "확인"], ["E-002", "발신자 프로필 캡처", "스크린샷", "확인 필요"], ["E-003", "거래 내역", "파일 업로드", "상충"], ["F-001", "기관 사칭 사실", "AI 추출", "원문 검토"]], "figma-desktop-table"));
@@ -2026,6 +2341,7 @@ function renderActualC08Desktop() {
 }
 
 function renderActualCaseDesktop(screen) {
+  if (!state.showReference) return renderRecordWorkspace("frozen", screen);
   if (screen === "c01") return renderActualC01Desktop();
   if (screen === "c02") return renderActualC02Desktop();
   if (screen === "c03") return renderActualC03Desktop();
@@ -2038,6 +2354,10 @@ function renderActualCaseDesktop(screen) {
 }
 
 function renderActualWorkspace() {
+  if (state.showReference) {
+    const banner = el("section", "record-reference-bar", el("strong", "", "기존 화면 예시 · 합성 시나리오"), el("p", "", "아래 수치·기관 처리 상태는 기존 설계 예시입니다. 실제 작업 중인 사건과 별개이며, 자동 저장·전송되지 않습니다."), recordViewButton("실제 작업 중인 사건으로 돌아가기", "frozen", "c01", true));
+    return el("div", "record-reference-wrapper", banner, renderActualCaseDesktop(state.workspaceScreen || "c01"));
+  }
   return renderActualCaseDesktop(state.workspaceScreen || "c01");
 }
 
@@ -2073,6 +2393,9 @@ function render() {
   else if (state.screen === "g03") page = renderActualG03();
   else if (state.screen === "before") page = renderBeforeCapture();
   else if (state.screen === "before-result") page = renderBeforeResult();
+  else if (state.screen === "after") page = renderAfterFlow();
+  else if (state.screen === "shield") page = renderShieldFlow();
+  else if (state.screen === "shield-workspace") page = renderRecordWorkspace("shield", state.shieldView);
   else if (state.screen === "workspace") page = renderActualWorkspace();
   else if (state.screen === "c01") page = renderActualC01Mobile();
   else if (state.screen === "c03") page = renderActualC03Mobile();
@@ -2101,7 +2424,7 @@ function selectCase(id, goToInput = true) {
   else render();
 }
 
-function runAnalysis() {
+async function runAnalysis() {
   if (state.busy) return;
   const value = state.message.trim();
   if (!value) {
@@ -2112,12 +2435,20 @@ function runAnalysis() {
   state.busy = true;
   state.notice = "";
   render();
-  window.setTimeout(() => {
+  try {
+    const analysis = await requestBackendAnalysis(value);
+    state.gateAnalysis = analysis;
+    state.variant = analysis.label === "INJECTION" ? "INJECTION_DETECTED" : analysis.label;
+    state.busy = false;
+    state.notice = (analysis.model_version || "rules-v0.1-demo") + " 분석 결과입니다. 원문과 공식 채널을 함께 확인하세요.";
+    navigate("g02");
+  } catch (error) {
+    state.gateAnalysis = null;
     state.variant = mockAnalyze(value);
     state.busy = false;
-    state.notice = "로컬 mock 분석 결과입니다. 원문과 공식 채널을 함께 확인하세요.";
+    state.notice = "분석 서버에 연결하지 못해 로컬 예비 규칙을 사용했습니다. 원문과 공식 채널을 함께 확인하세요.";
     navigate("g02");
-  }, 220);
+  }
 }
 
 document.addEventListener("click", (event) => {
@@ -2141,6 +2472,8 @@ document.addEventListener("click", (event) => {
       state.notice = "";
     }
     if (screenTarget.dataset.screen === "before") resetBeforeFlow();
+    if (screenTarget.dataset.screen === "after") resetAfterFlow();
+    if (screenTarget.dataset.screen === "shield") resetShieldFlow();
     navigate(screenTarget.dataset.screen);
     return;
   }
@@ -2148,6 +2481,7 @@ document.addEventListener("click", (event) => {
   if (!target) return;
   event.preventDefault();
   const action = target.dataset.action;
+  if (handleRecordAction(target)) return;
   if (action === "toggle-home-nav") {
     state.homeNavOpen = !state.homeNavOpen;
     render();
@@ -2176,6 +2510,7 @@ document.addEventListener("click", (event) => {
     state.workspaceScreen = nextScreen;
     navigate("workspace");
   } else if (action === "open-consent") {
+    state.notice = "";
     navigate("g03");
   } else if (action === "analyze-sample") {
     state.message = FIGMA_SAMPLE_TEXT;
@@ -2192,7 +2527,15 @@ document.addEventListener("click", (event) => {
       render();
       return;
     }
-    state.notice = "사건 화면으로 이동했습니다. 실제 사건 생성·저장은 실행하지 않는 mock 흐름입니다.";
+    try {
+      startFrozenRecord(state.message);
+    } catch (error) {
+      state.notice = error.message;
+      render();
+      return;
+    }
+    state.showReference = false;
+    state.notice = "사건 작업을 시작했습니다. 새로고침 전 자료를 내려받으세요.";
     state.beforeNotice = "";
     navigate(state.entryFlow === "before" ? "before" : "c01");
   } else if (action === "before-example") {
@@ -2204,6 +2547,24 @@ document.addEventListener("click", (event) => {
     render();
   } else if (action === "before-check") {
     runBeforeAnalysis();
+  } else if (action === "after-next") {
+    state.afterStep = Math.min(AFTER_STEPS.length - 1, state.afterStep + 1);
+    state.afterNotice = "";
+    writeHash();
+    render();
+  } else if (action === "after-back") {
+    state.afterStep = Math.max(0, state.afterStep - 1);
+    state.afterNotice = "";
+    writeHash();
+    render();
+  } else if (action === "shield-next") {
+    state.shieldStep = Math.min(SHIELD_STEPS.length - 1, state.shieldStep + 1);
+    writeHash();
+    render();
+  } else if (action === "shield-back") {
+    state.shieldStep = Math.max(0, state.shieldStep - 1);
+    writeHash();
+    render();
   } else if (action === "before-freeze") {
     state.entryFlow = "freeze";
     state.beforeNotice = "";

@@ -1,0 +1,119 @@
+/* Functional case workspaces share the existing FinGuard frame and tokens. */
+.record-workspace { align-items: stretch; font-size: 14px; }
+.record-workspace .figma-desktop-main { min-width: 0; }
+.record-workspace .figma-desktop-title { font-size: 26px; line-height: 1.35; }
+.record-workspace .figma-desktop-subtitle { font-size: 13px; overflow-wrap: anywhere; }
+.record-workspace .figma-desktop-header { align-items: center; }
+.record-workspace .figma-rail-caption { font-size: 12px; line-height: 1.6; letter-spacing: 0; }
+.record-workspace .figma-rail-item { min-height: 44px; font-size: 14px; }
+.record-workspace .figma-rail-subtitle { font-size: 12px; }
+.record-workspace .figma-badge { height: auto; min-height: 24px; padding: 4px 8px; font-size: 11px; white-space: normal; }
+.record-workspace .figma-desktop-section-title { font-size: 17px; line-height: 1.5; }
+.record-workspace .figma-desktop-section-description { font-size: 13px; line-height: 1.65; }
+.record-workspace .figma-desktop-stat-label { font-size: 13px; }
+.record-workspace .figma-desktop-stat-value { font-size: 28px; }
+.record-workspace .figma-desktop-stat-note { font-size: 12px; color: var(--muted); }
+.record-workspace .figma-callout-title { font-size: 14px; }
+.record-workspace .figma-callout-copy { font-size: 13px; line-height: 1.7; }
+.record-workspace .figma-primary, .record-workspace .figma-secondary { min-height: 44px; height: auto; padding: 11px 14px; font-size: 14px; line-height: 1.5; }
+.record-workspace .figma-secondary { white-space: normal; text-align: left; overflow-wrap: anywhere; }
+.record-workspace button:disabled { cursor: not-allowed; opacity: .5; }
+.record-workspace :is(button, input, textarea, select, a):focus-visible { outline: 3px solid var(--info); outline-offset: 3px; }
+.record-content { align-content: start; gap: 16px; }
+.record-content h3 { font-size: 15px; line-height: 1.5; }
+.record-section-stack { display: grid; align-content: start; gap: 16px; min-width: 0; }
+.record-storage-notice { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); font-size: 12px; color: var(--muted); line-height: 1.6; }
+.record-storage-notice strong { color: var(--text); font-size: 13px; }
+.record-notice { margin: 0; padding: 12px 16px; border-left: 3px solid var(--info); border-radius: 4px; background: var(--info-soft); color: var(--info); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.record-notice:empty { display: none; }
+.record-summary-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr); align-items: start; gap: 16px; }
+.record-intake-layout { grid-template-columns: minmax(0, 1.4fr) minmax(240px, .6fr); }
+.record-muted { color: var(--muted); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.record-empty { padding: 36px; border: 1px dashed var(--line-strong); border-radius: var(--radius); background: var(--surface); }
+.record-empty h2 { margin: 0 0 8px; font-size: 24px; color: var(--navy); }
+.record-empty p { margin: 0 0 24px; color: var(--muted); font-size: 15px; line-height: 1.7; }
+.record-empty .button + .button { margin: 12px 0 0; }
+.record-form { display: grid; gap: 16px; }
+.record-form-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.record-field { display: grid; gap: 8px; min-width: 0; color: var(--text); font-size: 13px; font-weight: 600; }
+.record-input { display: block; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 11px 12px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-size: 14px; font-weight: 400; line-height: 1.65; }
+textarea.record-input { resize: vertical; min-height: 88px; }
+.record-input::placeholder { color: var(--muted); opacity: 1; }
+.record-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.record-actions .button { width: auto; }
+.record-file-label { display: grid; gap: 8px; font-size: 13px; color: var(--info); }
+.record-file-input { max-width: 100%; font-size: 12px; color: var(--muted); }
+.record-mini-source { padding: 16px 0; border-top: 1px solid var(--line); }
+.record-mini-source:first-of-type { padding-top: 0; border-top: 0; }
+.record-mini-source strong, .record-mini-source h3 { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.record-mini-source p { margin: 6px 0; font-size: 13px; color: var(--muted); line-height: 1.65; }
+.record-source-excerpt { white-space: pre-wrap; overflow-wrap: anywhere; }
+.record-workbench { display: grid; grid-template-columns: minmax(160px, .65fr) minmax(240px, 1.15fr) minmax(260px, 1fr); align-items: start; gap: 12px; }
+.record-workbench .figma-desktop-section { padding: 16px; }
+.record-source-button, .record-fact-button { display: grid; gap: 8px; width: 100%; margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); text-align: left; font: inherit; font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; cursor: pointer; }
+.record-source-button > span { font-size: 12px; color: var(--muted); }
+.record-source-button.is-selected, .record-fact-button.is-selected { border-color: var(--info); background: var(--info-soft); }
+.record-source-button:hover, .record-fact-button:hover { border-color: var(--info); }
+.record-fact-button .figma-badge { justify-self: start; }
+.record-source-title { margin: 0 0 12px; }
+.record-original { margin: 0; padding: 16px; border-left: 3px solid var(--info); border-radius: 4px; background: var(--surface-soft); color: var(--text); font-size: 15px; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
+.record-review-form { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.record-quote-label { margin: 0; color: var(--muted); font-size: 12px; }
+.record-quote { margin: 0; padding: 12px; border-radius: 6px; background: var(--warning-soft); color: var(--text); font-size: 13px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.record-signals { display: grid; gap: 12px; }
+.record-signal { padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.record-signal strong { display: block; color: var(--danger); font-size: 13px; margin-bottom: 8px; }
+.record-signal q { font-size: 14px; overflow-wrap: anywhere; }
+.record-signal p { margin-bottom: 0; font-size: 12px; line-height: 1.65; color: var(--muted); }
+.record-issue { margin-top: 12px; padding: 16px; border-left: 3px solid var(--warning); border-radius: 6px; background: var(--warning-soft); }
+.record-issue h3 { margin: 0 0 8px; }
+.record-issue p { margin: 0 0 12px; font-size: 14px; line-height: 1.7; }
+.record-timeline-item { display: grid; grid-template-columns: 145px minmax(0, 1fr); gap: 16px; padding: 20px 0; border-top: 1px solid var(--line); }
+.record-timeline-item h3, .record-timeline-item p { margin: 0 0 8px; }
+.record-timeline-item time, .record-history-row time { color: var(--muted); font-size: 12px; }
+.record-history-row { padding: 12px 0; border-top: 1px solid var(--line); }
+.record-history-row p { font-size: 13px; }
+.record-include-row { display: flex; align-items: flex-start; gap: 12px; padding: 16px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.record-include-row input { flex: 0 0 auto; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--blue); }
+.record-include-row > span { display: grid; gap: 5px; min-width: 0; }
+.record-include-row strong { font-size: 14px; overflow-wrap: anywhere; }
+.record-include-row small { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.record-report-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(270px, .65fr); align-items: start; gap: 16px; }
+.record-report-preview { display: block; width: 100%; height: 780px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.record-official-link { color: var(--info); font-size: 14px; font-weight: 700; text-underline-offset: 3px; }
+.record-rail-footer { margin-top: auto; padding: 24px 8px 4px; font-size: 12px; line-height: 1.6; color: #cbd5e1; }
+.record-rail-footer p { font-size: 12px; }
+.record-rail-footer .figma-secondary { padding: 10px; font-size: 12px; }
+.record-rail-link { padding: 8px 0; border: 0; background: transparent; color: #fff; text-decoration: underline; cursor: pointer; font: inherit; }
+.record-reference-bar { width: min(100%, 1450px); padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--warning-soft); margin-bottom: 16px; }
+.record-reference-bar p { font-size: 14px; }
+.record-reference-wrapper { width: 100%; }
+.record-entry-actions { display: grid; gap: 10px; margin-top: 20px; }
+.record-entry-actions .button { min-height: 44px; font-size: 14px; }
+@media (max-width: 1150px) {
+  .record-workbench { grid-template-columns: minmax(0, 1fr) minmax(260px, 1fr); }
+  .record-workbench > :first-child { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; align-items: start; }
+  .record-workbench > :first-child .figma-desktop-section-head { width: 100%; margin-bottom: 0; }
+  .record-workbench .record-source-button { width: auto; flex: 1 1 150px; }
+  .record-intake-layout { grid-template-columns: 1fr; }
+  .record-report-grid { grid-template-columns: 1fr; }
+  .record-report-grid > :last-child { grid-row: 1; }
+}
+@media (max-width: 900px) {
+  .record-summary-grid, .record-workbench { grid-template-columns: minmax(0, 1fr); }
+  .record-workspace .figma-desktop-header { align-items: start; }
+  .record-workspace .figma-desktop-header > .figma-badge { max-width: 100px; }
+}
+@media (max-width: 680px) {
+  .record-workspace .figma-rail-nav { display: flex; flex-wrap: nowrap; }
+  .record-workspace .figma-rail-item { flex-shrink: 0; min-height: 44px; }
+  .record-rail-footer { display: none; }
+  .record-workspace .figma-desktop-title { font-size: 24px; }
+  .record-workspace .figma-desktop-header { flex-wrap: wrap; gap: 12px; }
+  .record-form-row { grid-template-columns: minmax(0, 1fr); }
+  .record-storage-notice { padding: 12px; }
+  .record-empty { padding: 24px 16px; }
+  .record-timeline-item { grid-template-columns: 1fr; gap: 8px; }
+  .record-report-preview { height: 620px; }
+  .record-reference-bar { border-radius: 0; }
+}
