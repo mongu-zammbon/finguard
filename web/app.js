@@ -223,7 +223,7 @@ const LANDING_STAGES = [
     description: "거래·대화·문서를 연결해 금융회사가\n검토할 소명팩을 구성합니다.",
     mobileDescription: "거래·대화·문서를 연결해\n지급정지 소명팩을 구성합니다.",
     action: "소명 준비 시작하기",
-    target: "workspace",
+    target: "s00",
     tone: "green",
   },
 ];

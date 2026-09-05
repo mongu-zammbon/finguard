@@ -85,6 +85,14 @@ class ServerContractTests(unittest.TestCase):
         for marker in ("landing-nav", "landing-primary-nav", "landing-menu-toggle", "landing-stage-grid"):
             self.assertIn(marker, styles_css)
 
+    def test_after_freeze_entry_uses_gate_flow(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        start = app_js.index('id: "landing-stage-after-freeze"')
+        end = app_js.index("\n  },\n];", start)
+        stage = app_js[start:end]
+        self.assertIn('action: "소명 준비 시작하기"', stage)
+        self.assertIn('target: "s00"', stage)
+
     def test_service_exposes_optional_consent_flow_without_storage_claim(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
         for marker in (
