@@ -202,6 +202,13 @@ const LANDING_NAV_ITEMS = [
   { id: "try", label: "체험하기", type: "screen", target: "s00" },
 ];
 
+const PROTOTYPE_NAV_ITEMS = [
+  { id: "home", label: "홈", screen: "home", flow: "default" },
+  { id: "before", label: "행동 전", screen: "before", flow: "before" },
+  { id: "after-transfer", label: "송금 직후", screen: "workspace", flow: "transfer" },
+  { id: "after-freeze", label: "계좌 정지 후", screen: "s00", flow: "freeze" },
+];
+
 const LANDING_STAGES = [
   {
     id: "landing-stage-before",
@@ -1451,6 +1458,42 @@ function landingNavigation() {
   return header;
 }
 
+function prototypeNavRouteIsActive(route) {
+  if (route === "home") return state.screen === "home";
+  if (route === "before") return ["before", "before-result"].includes(state.screen);
+  if (route === "after-transfer") {
+    return (state.screen === "workspace" || CASE_SCREENS.some(([id]) => id === state.screen)) && state.entryFlow === "transfer";
+  }
+  if (route === "after-freeze") return ["s00", "g01", "g02", "g03"].includes(state.screen) && state.entryFlow === "freeze";
+  return false;
+}
+
+function prototypeNavigation() {
+  const header = el("header", "prototype-nav");
+  const inner = el("div", "prototype-nav-inner");
+  const brand = setAttrs(screenButton("", "home", "prototype-nav-brand"), {
+    "aria-label": "FinGuard 홈",
+    "data-entry-flow": "default",
+    "data-nav-route": "home",
+  });
+  append(brand, setAttrs(el("img", "prototype-nav-brand-mark"), { src: "/figma-main-nav-brand.svg", alt: "" }), el("span", "prototype-nav-brand-name", "FinGuard"));
+
+  const links = setAttrs(el("nav", "prototype-nav-links"), { "aria-label": "주요 메뉴" });
+  PROTOTYPE_NAV_ITEMS.forEach((item) => {
+    const active = prototypeNavRouteIsActive(item.id);
+    links.append(screenButton(item.label, item.screen, `prototype-nav-link ${active ? "is-active" : ""}`.trim(), {
+      "aria-current": active ? "page" : undefined,
+      "data-entry-flow": item.flow,
+      "data-nav-route": item.id,
+    }));
+  });
+
+  const cta = screenButton("지급정지 소명 시작", "s00", "prototype-nav-cta", { "data-entry-flow": "freeze" });
+  inner.append(brand, links, cta);
+  header.append(inner);
+  return header;
+}
+
 function landingStageCard(stage) {
   const card = setAttrs(el("article", `landing-stage-card landing-stage-${stage.tone}`), { id: stage.id });
   const description = el("p", "landing-stage-description");
@@ -1816,9 +1859,27 @@ function renderBeforeResult() {
   body.append(nextActions);
 
   const actions = el("div", "before-result-actions");
-  append(actions, figmaPrimary("공식 채널에서 확인하기", "before-verify", { "aria-describedby": "before-result-note" }), actionButton("다른 메시지 점검하기", "before-capture", "button figma-secondary"));
+  const verificationOpen = Boolean(state.beforeNotice);
+  if (verificationOpen) {
+    const verification = setAttrs(el("section", "before-result-verification-panel"), {
+      id: "before-verification-panel",
+      role: "status",
+      "aria-live": "polite",
+    });
+    append(
+      verification,
+      el("strong", "before-result-verification-title", "공식 채널 확인 안내"),
+      el("p", "before-result-verification-copy", state.beforeNotice),
+      el("ul", "before-result-verification-list", el("li", "", "은행 앱을 직접 열어 확인"), el("li", "", "카드 뒷면·공식 홈페이지의 대표번호 사용"), el("li", "", "메시지 속 번호·링크는 사용하지 않기")),
+    );
+    body.append(verification);
+  }
+  append(actions, figmaPrimary("공식 채널에서 확인하기", "before-verify", {
+    "aria-describedby": "before-result-note",
+    "aria-expanded": String(verificationOpen),
+    "aria-controls": "before-verification-panel",
+  }), actionButton("다른 메시지 점검하기", "before-capture", "button figma-secondary"));
   body.append(actions);
-  if (state.beforeNotice) body.append(setAttrs(el("p", "before-result-notice", state.beforeNotice), { role: "status", "aria-live": "polite" }));
   if (analysis.source === "file") body.append(el("p", "before-result-source-note", `프론트 MVP 데모 · ${analysis.fileName}을 선택한 입력으로 처리했습니다. 실제 OCR 연동 전 단계입니다.`));
   body.append(el("p", "before-result-note", "위험 신호 참고용 · 최종 확인은 공식 채널과 상담으로 진행하세요."));
   return beforeMobileFrame("RESULT", body, "before-result-mobile");
@@ -2000,7 +2061,9 @@ function renderActualComponents() {
 }
 
 function render() {
-  appMain.classList.toggle("is-landing", state.screen === "home");
+  const isLanding = state.screen === "home";
+  appMain.classList.toggle("is-landing", isLanding);
+  appMain.classList.toggle("is-prototype", !isLanding);
   let page;
   if (state.screen === "home") page = renderLandingPage();
   else if (state.screen === "overview") page = renderOverview();
@@ -2017,7 +2080,15 @@ function render() {
   else if (state.screen === "reviewer") page = renderActualReviewer();
   else if (state.screen === "components") page = renderActualComponents();
   else page = renderActualS00();
-  appMain.replaceChildren(page);
+  if (isLanding) {
+    appMain.replaceChildren(page);
+  } else {
+    const shell = el("div", "prototype-page-shell");
+    const content = el("div", "prototype-page-content");
+    content.append(page);
+    shell.append(prototypeNavigation(), content);
+    appMain.replaceChildren(shell);
+  }
   updateNav();
 }
 
