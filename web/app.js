@@ -205,7 +205,7 @@ const LANDING_STAGES = [
     description: "문자·스크린샷·링크 문맥에서\n송금·인증·클릭을 멈춥니다.",
     mobileDescription: "문자·스크린샷·링크 문맥에서\n송금·인증·클릭을 멈춥니다.",
     action: "지금 메시지 점검하기",
-    target: "s00",
+    target: "before",
     flow: "before",
     tone: "blue",
   },
@@ -454,10 +454,10 @@ function parseHash() {
   const raw = window.location.hash.replace(/^#/, "");
   if (!raw) return;
   const [screen, value] = raw.split("/");
-  if (["home", "overview", "s00", "g01", "g02", "g03", "before", "workspace", "c01", "c02", "c03", "c04", "c05a", "c05b", "c06", "c07", "c08", "reviewer", "components"].includes(screen)) {
+  if (["home", "overview", "s00", "g01", "g02", "g03", "before", "before-result", "workspace", "c01", "c02", "c03", "c04", "c05a", "c05b", "c06", "c07", "c08", "reviewer", "components"].includes(screen)) {
     state.screen = screen;
   }
-  if (screen === "before") state.entryFlow = "before";
+  if (screen === "before" || screen === "before-result") state.entryFlow = "before";
   if (screen === "g02" && RESULT_STATES[value]) state.variant = value;
   if (screen === "g01" && value === "DIRECT_INPUT") state.entryMode = "direct";
   if (screen === "g01" && value !== "DIRECT_INPUT") state.entryMode = "screenshot";
@@ -1348,7 +1348,7 @@ function renderLandingPage() {
   const heroActions = el("div", "landing-hero-actions");
   append(
     heroActions,
-    screenButton("행동 전 점검 시작", "s00", "landing-button landing-button-primary", { "data-entry-flow": "before" }),
+    screenButton("행동 전 점검 시작", "before", "landing-button landing-button-primary", { "data-entry-flow": "before" }),
     screenButton("지급정지 소명 준비", "s00", "landing-button landing-button-secondary", { "data-entry-flow": "freeze" }),
   );
   heroCopy.append(heroActions, el("p", "landing-hero-note", "법률·금융기관의 최종 판단을 대체하지 않습니다."));
@@ -1596,25 +1596,6 @@ function figmaDesktopFrame(rail, title, subtitle, content, className = "") {
   return frame;
 }
 
-function beforeRail(active = "ai") {
-  const rail = el("aside", "figma-service-rail figma-before-rail");
-  const brand = screenButton("FinGuard", "home", "figma-rail-brand-link", { "aria-label": "FinGuard 홈" });
-  append(rail, el("div", "figma-rail-brand", brand), el("span", "figma-rail-caption", "BEFORE · Safety Gate"), el("strong", "figma-rail-case", "사건 A · 합성"));
-  const nav = setAttrs(el("nav", "figma-rail-nav figma-before-nav"), { "aria-label": "행동 전 안전 게이트" });
-  [["overview", "개요"], ["intake", "자료 수집"], ["ai", "AI 사실 확인"], ["transaction", "거래 연결"], ["issue", "이슈 검토"], ["timeline", "타임라인"], ["report", "보고서"], ["supplement", "자료 보완"]].forEach(([id, label]) => {
-    const item = el("div", `figma-before-nav-item ${active === id ? "is-active" : ""}`.trim(), label);
-    nav.append(item);
-  });
-  rail.append(nav, el("div", "figma-before-rail-footer", "24시간 후 자동 삭제"));
-  return rail;
-}
-
-function figmaBeforeFrame(rail, content) {
-  const frame = el("div", "figma-desktop-frame figma-before-frame");
-  frame.append(rail, content);
-  return frame;
-}
-
 function figmaDesktopSection(title, description = "", className = "") {
   const section = el("section", `figma-desktop-section ${className}`.trim());
   append(section, el("div", "figma-desktop-section-head", el("h2", "figma-desktop-section-title", title), description ? el("p", "figma-desktop-section-description", description) : null));
@@ -1631,53 +1612,70 @@ function figmaDesktopStats(items) {
   return grid;
 }
 
-function beforeOverviewCard(label, value, description, tone = "blue") {
-  const card = el("article", `before-overview-card before-overview-card-${tone}`);
-  append(card, el("span", "before-overview-card-label", label), el("strong", "before-overview-card-value", value), el("span", "before-overview-card-description", description));
-  return card;
+function beforeMobileFrame(progress, content, className = "") {
+  return figmaMobileFrame(progress, content, `figma-before-mobile ${className}`.trim());
 }
 
-function beforeOverviewRow(label, value, meta) {
-  const row = el("div", "before-overview-row");
-  append(row, el("strong", "before-overview-row-label", label), el("span", "before-overview-row-value", value), el("span", "before-overview-row-meta", meta));
+function beforeResultEvidence(label, value) {
+  const row = el("div", "before-result-evidence-item");
+  append(row, el("span", "before-result-evidence-dot"), el("strong", "before-result-evidence-label", label), el("span", "before-result-evidence-value", value));
   return row;
 }
 
-function beforeOverviewCallout(title, description, actionLabel, action) {
-  const card = el("section", "before-overview-callout");
-  append(card, el("strong", "before-overview-callout-title", title), el("p", "before-overview-callout-copy", description), actionButton(actionLabel, action, "before-overview-callout-button"));
-  return card;
+function renderBeforeCapture() {
+  const body = el("div", "figma-screen-content before-capture-content");
+  append(
+    body,
+    el("span", "before-capture-kicker", "BEFORE · 행동 직전"),
+    el("h1", "before-capture-title", "송금·인증·클릭 전에\n30초만 멈춰보세요"),
+    el("p", "before-capture-intro", "메시지 한 건을 넣으면 위험 신호와\n지금 멈춰야 할 행동을 바로 보여드려요."),
+  );
+
+  const tabs = el("div", "before-capture-tabs");
+  append(tabs, el("span", "before-capture-tab is-active", "스크린샷"), el("span", "before-capture-tab", "직접 입력"));
+  body.append(tabs);
+
+  const upload = el("label", "before-capture-upload");
+  const input = setAttrs(el("input", "file-input"), { id: "before-screenshot-input", type: "file", accept: "image/*" });
+  append(upload, el("span", "before-capture-upload-icon", "↑"), el("strong", "", "문자·메시지 화면 업로드"), el("small", "", state.screenshotName || "PNG · JPG · 최대 10MB"), input);
+  body.append(upload, el("h2", "before-capture-sample-label", "입력 예시 · 실제 메시지 아님"));
+
+  const sample = el("div", "before-capture-sample");
+  const sampleCopy = el("div", "before-capture-sample-copy");
+  append(sampleCopy, el("p", "", "예시: “30분 안에 입금하지 않으면…”"), el("p", "", "→ 시간 제한 + 금전 요구를 확인합니다."));
+  append(sample, sampleCopy, actionButton("예시 보기", "before-example", "before-capture-sample-chip"));
+  body.append(sample, el("div", "before-capture-privacy", "업로드한 원문은 결과 확인 후 보관하지 않습니다."));
+  body.append(actionButton("메시지 점검하기", "before-check", "button figma-primary before-capture-primary"));
+  body.append(actionButton("이미 계좌가 막혔다면  계좌 정지 후 →", "before-freeze", "before-capture-alt"));
+  body.append(el("p", "before-capture-disclaimer", "위험 신호 참고용 · 사기 여부를 확정하지 않습니다."));
+  if (state.beforeNotice) body.append(el("p", "before-capture-notice", state.beforeNotice));
+  return beforeMobileFrame("BEFORE", body, "before-capture-mobile");
 }
 
-function renderBeforeOverview() {
-  const main = el("main", "before-overview-content");
-  const header = el("header", "before-overview-header");
-  const headerCopy = el("div", "before-overview-header-copy");
-  append(headerCopy, el("h1", "before-overview-title", "BEFORE / 행동 직전"), el("p", "before-overview-subtitle", "송금·인증·링크 클릭 직전의 30초를 멈추는 안전 게이트"));
-  append(header, headerCopy, figmaBadge("SAFETY_GATE / ACTIVE", "figma-badge-info"));
-  main.append(header);
+function renderBeforeResult() {
+  const body = el("div", "figma-screen-content before-result-content");
+  append(body, el("div", "before-result-stop", "STOP · 지금 송금·인증·클릭을 멈추세요"), el("h1", "before-result-title", "지금은 멈추세요"), el("p", "before-result-intro", "메시지 원문에서 3가지 위험 신호를 확인했습니다."));
 
-  const intro = el("section", "before-overview-intro");
-  append(intro, el("h2", "before-overview-intro-title", "대화에 설득되기 전에, 행동을 한 번 끊습니다."), el("p", "before-overview-intro-copy", "문자·스크린샷·결제 링크를 공유하면 위험 라벨·근거·안전한 다음 행동을 한 화면에 보여줍니다."));
-  main.append(intro);
+  const evidence = el("section", "before-result-evidence");
+  evidence.append(el("h2", "before-result-section-title", "메시지에서 확인된 근거"));
+  const evidenceList = el("div", "before-result-evidence-list");
+  evidenceList.append(beforeResultEvidence("금전 요구", "“입금하지 않으면…”\n해제 조건으로 돈을 요구"), beforeResultEvidence("시간 압박", "“30분 안에…”\n확인·상담할 시간을 줄임"), beforeResultEvidence("비공식 경로", "메시지 번호·링크로\n바로 행동을 유도"));
+  evidence.append(evidenceList);
+  body.append(evidence);
 
-  const cards = el("div", "before-overview-cards");
-  [["공유받은 입력", "01", "문자·스크린샷·링크", "blue"], ["압박 신호", "02", "지금 · 즉시 · 비밀", "green"], ["행동 직전", "03", "송금 · 인증 · 클릭", "orange"], ["안전 전환", "04", "중단 → 공식 확인", "red"]].forEach((item) => cards.append(beforeOverviewCard(...item)));
-  main.append(cards);
+  const nextActions = el("section", "before-result-next-actions");
+  append(nextActions, el("h2", "before-result-next-title", "지금 할 일"));
+  const list = el("ol", "before-result-next-list");
+  ["송금·인증·클릭 중단", "메시지 속 번호·링크 사용 금지", "은행 앱·공식 대표번호로 직접 확인"].forEach((item) => list.append(el("li", "", item)));
+  nextActions.append(list);
+  body.append(nextActions);
 
-  const gate = el("section", "before-overview-gate");
-  append(gate, el("h2", "before-overview-section-title", "행동 직전 안전 게이트"), el("p", "before-overview-section-copy", "공유된 문맥에서 멈출 근거와 다음 행동을 한 화면으로 정리합니다."));
-  const rows = el("div", "before-overview-rows");
-  [["입력 경로", "문자 · 스크린샷 · 결제 링크를 공유", "공유받기"], ["관찰 신호", "기관 사칭 · 긴급성 · 비밀 유지 · 금전 요구", "근거 3개 이상"], ["위험 라벨", "DANGER · INJECTION · CAUTION · ABSTAIN", "판정 대신 보류"], ["다음 행동", "송금·인증·링크 클릭을 중단", "공식 앱 · 대표번호"]].forEach((item) => rows.append(beforeOverviewRow(...item)));
-  gate.append(rows);
-  main.append(gate);
-
-  const callouts = el("div", "before-overview-callouts");
-  callouts.append(beforeOverviewCallout("지금 멈출 행동", "송금·인증·링크 클릭을 중단하세요.", "중단", "before-stop"), beforeOverviewCallout("공식 채널 확인", "공식 앱이나 대표번호로 직접 확인하세요.", "공식 확인", "before-verify"));
-  main.append(callouts);
-  if (state.beforeNotice) main.append(el("p", "before-overview-notice", state.beforeNotice));
-  main.append(el("p", "before-overview-footer", "낮은 위험도는 안전 증명이 아닙니다 · 모르면 사람 확인으로 넘깁니다. URL은 열지 않고 문자열만 확인합니다."));
-  return figmaBeforeFrame(beforeRail(), main);
+  const actions = el("div", "before-result-actions");
+  append(actions, figmaPrimary("공식 채널에서 확인하기", "before-verify", { "aria-describedby": "before-result-note" }), actionButton("다른 메시지 점검하기", "before-capture", "button figma-secondary"));
+  body.append(actions);
+  if (state.beforeNotice) body.append(setAttrs(el("p", "before-result-notice", state.beforeNotice), { role: "status", "aria-live": "polite" }));
+  body.append(el("p", "before-result-note", "위험 신호 참고용 · 최종 확인은 공식 채널과 상담으로 진행하세요."));
+  return beforeMobileFrame("RESULT", body, "before-result-mobile");
 }
 
 function figmaDesktopEvidence(label, value, source = "AI_EXTRACTED") {
@@ -1864,7 +1862,8 @@ function render() {
   else if (state.screen === "g01") page = renderActualG01();
   else if (state.screen === "g02") page = renderActualG02();
   else if (state.screen === "g03") page = renderActualG03();
-  else if (state.screen === "before") page = renderBeforeOverview();
+  else if (state.screen === "before") page = renderBeforeCapture();
+  else if (state.screen === "before-result") page = renderBeforeResult();
   else if (state.screen === "workspace") page = renderActualWorkspace();
   else if (state.screen === "c01") page = renderActualC01Mobile();
   else if (state.screen === "c03") page = renderActualC03Mobile();
@@ -1974,9 +1973,21 @@ document.addEventListener("click", (event) => {
     state.notice = "사건 화면으로 이동했습니다. 실제 사건 생성·저장은 실행하지 않는 mock 흐름입니다.";
     state.beforeNotice = "";
     navigate(state.entryFlow === "before" ? "before" : "c01");
-  } else if (action === "before-stop") {
-    state.beforeNotice = "송금·인증·링크 클릭을 중단하고, 공식 채널에서 직접 확인하세요.";
+  } else if (action === "before-example") {
+    state.message = FIGMA_SAMPLE_TEXT;
+    state.beforeNotice = "예시 메시지를 불러왔습니다. 메시지 점검하기를 눌러주세요.";
     render();
+  } else if (action === "before-check") {
+    state.variant = "DANGER";
+    state.beforeNotice = "";
+    navigate("before-result");
+  } else if (action === "before-freeze") {
+    state.entryFlow = "freeze";
+    state.beforeNotice = "";
+    navigate("s00");
+  } else if (action === "before-capture") {
+    state.beforeNotice = "";
+    navigate("before");
   } else if (action === "before-verify") {
     state.beforeNotice = "메시지 속 연락처가 아닌 공식 앱이나 대표번호로 직접 확인하세요.";
     render();
@@ -2012,6 +2023,12 @@ document.addEventListener("input", (event) => {
 document.addEventListener("change", (event) => {
   if (event.target.dataset.consentItem) {
     state.consentItems[event.target.dataset.consentItem] = event.target.checked;
+    return;
+  }
+  if (event.target.id === "before-screenshot-input") {
+    state.screenshotName = event.target.files?.[0]?.name || "";
+    const label = event.target.closest(".before-capture-upload")?.querySelector("small");
+    if (label) label.textContent = state.screenshotName || "PNG · JPG · 최대 10MB";
     return;
   }
   if (event.target.id === "screenshot-input") {

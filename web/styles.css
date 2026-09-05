@@ -518,86 +518,67 @@ a { color: inherit; }
 .phone-brand:hover, .phone-footer-brand:hover, .figma-mobile-brand:hover, .figma-rail-brand-link:hover, .figma-desktop-kicker:hover { color: #175cd3; }
 .figma-rail-brand-link { color: #fff; font-size: 15px; font-weight: 800; letter-spacing: -.045em; }
 
-/* Figma page 01 · BEFORE / 행동 직전 ------------------------------------- */
-.figma-before-frame {
-  grid-template-columns: 232px minmax(0, 1fr);
-  width: min(100%, 1280px);
-  min-height: 900px;
-  border-radius: 0;
-  box-shadow: 0 18px 42px rgba(16, 24, 40, .08);
-}
-.figma-before-rail { min-height: 900px; padding: 17px 12px 20px; background: #101828; }
-.figma-before-rail .figma-rail-brand { padding: 0 8px; }
-.figma-before-rail .figma-rail-brand-link { font-size: 20px; }
-.figma-before-rail .figma-rail-caption { margin: 17px 8px 7px; color: #98a2b3; font-size: 9px; letter-spacing: .04em; }
-.figma-before-rail .figma-rail-case { margin: 0 8px; color: #cbd5e1; font-size: 11px; }
-.figma-before-nav { gap: 4px; padding-top: 17px; border-top: 0; }
-.figma-before-nav-item { min-height: 37px; padding: 9px 11px; border: 1px solid transparent; border-radius: 7px; color: #cbd5e1; font-size: 13px; }
-.figma-before-nav-item.is-active { border-color: #2563eb; background: #2563eb; color: #fff; font-weight: 800; }
-.figma-before-rail-footer { margin-top: auto; padding: 11px 10px; border: 1px solid #344054; border-radius: 8px; color: #cbd5e1; font-size: 10px; }
-.before-overview-content { min-width: 0; min-height: 900px; padding: 17px 31px 28px; background: #fff; }
-.before-overview-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; min-height: 56px; padding-bottom: 9px; border-bottom: 1px solid #e4e7ec; }
-.before-overview-title { margin: 0; color: #101828; font-size: 24px; line-height: 1.15; letter-spacing: -.06em; }
-.before-overview-subtitle { margin: 5px 0 0; color: #667085; font-size: 12px; line-height: 1.4; }
-.before-overview-header > .figma-badge { flex: 0 0 auto; margin-top: 1px; min-width: 192px; justify-content: center; }
-.before-overview-intro { margin-top: 10px; }
-.before-overview-intro-title { margin: 0; color: #101828; font-size: 17px; line-height: 1.35; letter-spacing: -.05em; }
-.before-overview-intro-copy { margin: 6px 0 0; color: #667085; font-size: 12px; line-height: 1.45; }
-.before-overview-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
-.before-overview-card { display: grid; align-content: start; min-height: 88px; padding: 13px; border: 1px solid #d0d5dd; border-radius: 9px; background: #fff; }
-.before-overview-card-label { color: #667085; font-size: 12px; font-weight: 800; }
-.before-overview-card-value { margin-top: 5px; color: #175cd3; font-size: 28px; line-height: 1; letter-spacing: -.06em; }
-.before-overview-card-description { margin-top: 9px; color: #667085; font-size: 11px; line-height: 1.2; }
-.before-overview-card-green .before-overview-card-value { color: #027a48; }
-.before-overview-card-orange .before-overview-card-value { color: #b54708; }
-.before-overview-card-red .before-overview-card-value { color: #b42318; }
-.before-overview-gate { margin-top: 29px; }
-.before-overview-section-title { margin: 0; color: #101828; font-size: 17px; line-height: 1.35; letter-spacing: -.05em; }
-.before-overview-section-copy { margin: 7px 0 0; color: #667085; font-size: 12px; line-height: 1.4; }
-.before-overview-rows { display: grid; gap: 4px; margin-top: 13px; }
-.before-overview-row { display: grid; grid-template-columns: 145px minmax(0, 1fr) 180px; align-items: center; min-height: 41px; padding: 0 13px; border: 1px solid #d0d5dd; color: #344054; }
-.before-overview-row-label { color: #101828; font-size: 12px; }
-.before-overview-row-value, .before-overview-row-meta { min-width: 0; font-size: 12px; }
-.before-overview-row-meta { color: #344054; text-align: right; }
-.before-overview-callouts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 60px; }
-.before-overview-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: 15px; min-height: 86px; padding: 12px; border: 1px solid #b2ddff; border-radius: 9px; background: #eff8ff; }
-.before-overview-callout:nth-child(2) { border-color: #fedf89; background: #fffaeb; }
-.before-overview-callout-title { color: #175cd3; font-size: 13px; }
-.before-overview-callout:nth-child(2) .before-overview-callout-title { color: #b54708; }
-.before-overview-callout-copy { margin: 8px 0 0; color: #344054; font-size: 11px; line-height: 1.4; }
-.before-overview-callout-button { grid-column: 2; grid-row: 1 / span 2; align-self: start; min-width: 76px; min-height: 29px; padding: 5px 11px; border: 1px solid #b2ddff; border-radius: 999px; background: #fff; color: #175cd3; font-size: 10px; font-weight: 800; }
-.before-overview-callout:nth-child(2) .before-overview-callout-button { border-color: #fedf89; color: #b54708; }
-.before-overview-notice { margin: 16px 0 0; color: #175cd3; font-size: 11px; }
-.before-overview-footer { margin: 28px 0 0; color: #344054; font-size: 12px; line-height: 1.4; }
-
-@media (max-width: 960px) {
-  .figma-before-frame { grid-template-columns: 178px minmax(0, 1fr); }
-  .before-overview-content { padding-left: 21px; padding-right: 21px; }
-  .before-overview-row { grid-template-columns: 118px minmax(0, 1fr) 135px; }
-}
+/* Figma page 01 · BEFORE / 30초 안전 게이트 ------------------------------ */
+.figma-before-mobile { border-radius: 18px; }
+.figma-before-mobile .figma-mobile-topbar { height: 56px; padding: 0 19px; }
+.figma-before-mobile .figma-mobile-brand { color: #171f30; font-size: 14px; line-height: 18px; }
+.figma-before-mobile .figma-mobile-progress { min-width: 68px; height: 24px; padding: 5px 10px; border: 0; background: #edf5ff; color: #1a61d6; font-size: 10px; font-weight: 800; line-height: 14px; }
+.figma-before-mobile .figma-mobile-body { height: calc(100% - 56px); padding: 24px 19px 18px; }
+.before-capture-content, .before-result-content { color: #171f30; }
+.before-capture-kicker { display: block; height: 16px; color: #1a61d6; font-size: 10px; font-weight: 800; line-height: 13px; }
+.before-capture-title { min-height: 62px; margin: 8px 0 0; color: #171f30; font-size: 23px; font-weight: 800; line-height: 29px; letter-spacing: -.075em; white-space: pre-line; }
+.before-capture-intro { min-height: 38px; margin: 8px 0 0; color: #616e82; font-size: 11px; line-height: 15px; white-space: pre-line; }
+.before-capture-tabs { display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 38px; margin-top: 12px; padding: 2px; border: 1px solid #f5f7fa; border-radius: 12px; background: #f5f7fa; }
+.before-capture-tab { display: grid; place-items: center; border-radius: 8px; color: #616e82; font-size: 10px; font-weight: 600; }
+.before-capture-tab.is-active { border: 1px solid #d6e0ed; background: #fff; color: #171f30; }
+.before-capture-upload { display: grid; place-items: center; gap: 6px; width: 100%; height: 106px; margin-top: 14px; padding: 12px; border: 1px solid #d6e0ed; border-radius: 12px; background: #f5f7fa; cursor: pointer; text-align: center; }
+.before-capture-upload:hover { border-color: #1a61d6; }
+.before-capture-upload-icon { display: grid; place-items: center; width: 42px; height: 24px; border-radius: 12px; background: #edf5ff; color: #1a61d6; font-size: 14px; font-weight: 800; line-height: 14px; }
+.before-capture-upload strong { color: #171f30; font-size: 12px; line-height: 15px; }
+.before-capture-upload small { color: #616e82; font-size: 10px; line-height: 13px; }
+.before-capture-sample-label { height: 16px; margin: 18px 0 0; color: #171f30; font-size: 10px; font-weight: 800; line-height: 13px; }
+.before-capture-sample { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; width: 100%; height: 84px; margin-top: 6px; padding: 13px; border: 1px solid #d6e0ed; border-radius: 12px; background: #edf5ff; }
+.before-capture-sample-copy { min-width: 0; color: #171f30; font-size: 11px; line-height: 17px; }
+.before-capture-sample-copy p { margin: 0; white-space: nowrap; }
+.before-capture-sample-chip { flex: 0 0 86px; align-self: flex-end; width: 86px; height: 24px; min-height: 24px; padding: 5px 10px; border: 0; border-radius: 12px; background: #fff; color: #c21a12; font-size: 10px; font-weight: 800; line-height: 14px; }
+.before-capture-sample-chip:hover { background: #fff; color: #c21a12; }
+.before-capture-privacy { display: flex; align-items: center; width: 100%; height: 48px; margin-top: 16px; padding: 0 13px; border-radius: 12px; background: #edf5ff; color: #1a61d6; font-size: 10px; font-weight: 600; line-height: 13px; }
+.before-capture-primary { width: 100%; height: 44px; min-height: 44px; margin-top: 24px; border-radius: 9px; background: #1a61d6; font-size: 12px; line-height: 16px; }
+.before-capture-primary:hover { background: #1554bc; }
+.before-capture-alt { width: 100%; min-height: 18px; margin-top: 18px; padding: 0; border: 0; background: transparent; color: #1a61d6; font-size: 10px; font-weight: 600; line-height: 13px; text-align: left; }
+.before-capture-alt:hover { background: transparent; color: #1554bc; }
+.before-capture-disclaimer { min-height: 28px; margin: 20px 0 0; color: #616e82; font-size: 9px; line-height: 12px; }
+.before-capture-notice, .before-result-notice { margin: 10px 0 0; color: #1a61d6; font-size: 10px; line-height: 14px; }
+.before-result-mobile .figma-mobile-body { padding-top: 14px; }
+.before-result-stop { display: flex; align-items: center; width: 100%; height: 52px; padding: 0 13px; border: 1px solid #ffb8ad; border-radius: 12px; background: #fff0eb; color: #c21a12; font-size: 11px; font-weight: 800; line-height: 15px; }
+.before-result-title { height: 30px; margin: 18px 0 0; color: #171f30; font-size: 23px; font-weight: 800; line-height: 28px; letter-spacing: -.075em; }
+.before-result-intro { height: 18px; margin: 8px 0 0; color: #616e82; font-size: 11px; line-height: 14px; }
+.before-result-evidence { margin-top: 22px; }
+.before-result-section-title { height: 18px; margin: 0; color: #171f30; font-size: 12px; font-weight: 800; line-height: 15px; }
+.before-result-evidence-list { display: grid; gap: 10px; margin-top: 10px; }
+.before-result-evidence-item { display: grid; grid-template-columns: 8px 88px minmax(0, 1fr); gap: 10px; align-items: start; width: 100%; height: 54px; padding: 7px 11px; border: 1px solid #d6e0ed; border-radius: 12px; background: #fff; }
+.before-result-evidence-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 4px; background: #c21a12; }
+.before-result-evidence-label { color: #171f30; font-size: 10px; line-height: 14px; }
+.before-result-evidence-value { min-width: 0; color: #616e82; font-size: 11px; line-height: 14px; white-space: pre-line; }
+.before-result-next-actions { width: 100%; height: 104px; margin-top: 18px; padding: 11px 13px; border: 1px solid #d6e0ed; border-radius: 12px; background: #edf5ff; }
+.before-result-next-title { height: 18px; margin: 0; color: #1a61d6; font-size: 11px; font-weight: 800; line-height: 15px; }
+.before-result-next-list { display: grid; gap: 0; margin: 4px 0 0; padding: 0 0 0 15px; color: #171f30; font-size: 10px; line-height: 17px; }
+.before-result-actions { display: grid; gap: 14px; margin-top: 14px; }
+.before-result-actions .figma-primary, .before-result-actions .figma-secondary { width: 100%; height: 44px; min-height: 44px; }
+.before-result-actions .figma-primary { border-radius: 9px; background: #1a61d6; font-size: 12px; }
+.before-result-actions .figma-primary:hover { background: #1554bc; }
+.before-result-actions .figma-secondary { font-size: 12px; }
+.before-result-note { height: 30px; margin: 17px 0 0; color: #616e82; font-size: 9px; line-height: 12px; }
 
 @media (max-width: 680px) {
-  .figma-before-frame { display: block; width: 100%; min-height: 100vh; border-radius: 0; }
-  .figma-before-rail { min-height: 0; padding: 13px 12px 10px; }
-  .figma-before-rail .figma-rail-caption, .figma-before-rail .figma-rail-case, .figma-before-rail-footer { display: none; }
-  .figma-before-rail .figma-rail-brand { padding: 0 3px 10px; }
-  .figma-before-rail .figma-rail-brand-link { font-size: 18px; }
-  .figma-before-nav { display: flex; gap: 5px; overflow-x: auto; padding-top: 8px; }
-  .figma-before-nav-item { flex: 0 0 auto; min-height: 36px; padding: 8px 10px; white-space: nowrap; }
-  .before-overview-content { min-height: calc(100vh - 95px); padding: 20px 16px 28px; }
-  .before-overview-header { display: block; }
-  .before-overview-header > .figma-badge { margin-top: 12px; }
-  .before-overview-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .before-overview-row { grid-template-columns: 1fr; gap: 4px; align-items: start; padding: 10px 12px; }
-  .before-overview-row-meta { text-align: left; }
-  .before-overview-callouts { grid-template-columns: 1fr; margin-top: 28px; }
+  .figma-before-mobile { border-radius: 0; }
 }
 
-@media (max-width: 430px) {
-  .before-overview-cards { gap: 8px; }
-  .before-overview-card { padding: 11px; }
-  .before-overview-card-value { font-size: 24px; }
-  .before-overview-row-value, .before-overview-row-meta { font-size: 11px; }
+@media (max-width: 360px) {
+  .figma-before-mobile .figma-mobile-body { padding-right: 16px; padding-left: 16px; }
+  .before-capture-sample-copy p { font-size: 10px; }
+  .before-capture-sample-chip { flex-basis: 78px; width: 78px; padding-right: 7px; padding-left: 7px; }
+  .before-result-evidence-item { grid-template-columns: 8px 76px minmax(0, 1fr); gap: 7px; padding-right: 8px; padding-left: 8px; }
 }
 
 .figma-stepper-nav { gap: 0; }
