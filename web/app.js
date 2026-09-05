@@ -1350,7 +1350,6 @@ function renderLandingPage() {
     heroActions,
     screenButton("행동 전 점검 시작", "s00", "landing-button landing-button-primary", { "data-entry-flow": "before" }),
     screenButton("지급정지 소명 준비", "s00", "landing-button landing-button-secondary", { "data-entry-flow": "freeze" }),
-    screenButton("송금 직후 대응 보기", "workspace", "landing-button landing-button-tertiary", { "data-entry-flow": "transfer" }),
   );
   heroCopy.append(heroActions, el("p", "landing-hero-note", "법률·금융기관의 최종 판단을 대체하지 않습니다."));
 

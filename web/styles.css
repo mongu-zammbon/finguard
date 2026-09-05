@@ -898,11 +898,3 @@ a { color: inherit; }
   .landing-copy-desktop { display: none; }
   .landing-copy-mobile { display: block; }
 }
-
-/* Keep the third entry CTA within the Figma-sized hero without overlap. ----- */
-.landing-button-tertiary { width: 160px; min-width: 160px; border-color: #d0d5dd; background: #f8fafc; color: #344054; }
-.landing-button-tertiary:hover { border-color: #98a2b3; background: #f2f4f7; }
-@media (max-width: 740px) {
-  .landing-hero-inner { height: 444px; min-height: 444px; }
-  .landing-button-tertiary { width: 100%; min-width: 100%; min-height: 48px; height: 48px; }
-}
