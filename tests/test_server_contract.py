@@ -71,9 +71,17 @@ class ServerContractTests(unittest.TestCase):
     def test_service_starts_with_responsive_main_navigation(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
         styles_css = (WEB_ROOT / "styles.css").read_text(encoding="utf-8")
-        self.assertTrue((WEB_ROOT / "figma-brand-mark.svg").is_file())
+        for asset in (
+            "figma-brand-mark.svg",
+            "figma-main-nav-brand.svg",
+            "figma-main-nav-cta.svg",
+            "figma-main-nav-divider.svg",
+        ):
+            self.assertTrue((WEB_ROOT / asset).is_file(), asset)
         for marker in ("renderLandingPage", "landingNavigation", "landing-mobile-menu", "toggle-home-nav", "scroll-home"):
             self.assertIn(marker, app_js)
+        for copy in ("금융사고 전후의 흩어진 자료를", "지급정지 소명팩을 구성합니다."):
+            self.assertIn(copy, app_js)
         for marker in ("landing-nav", "landing-primary-nav", "landing-menu-toggle", "landing-stage-grid"):
             self.assertIn(marker, styles_css)
 

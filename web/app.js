@@ -201,6 +201,7 @@ const LANDING_STAGES = [
     badge: "행동 전",
     title: "행동 전",
     description: "문자·스크린샷·링크 문맥에서\n송금·인증·클릭을 멈춥니다.",
+    mobileDescription: "문자·스크린샷·링크 문맥에서\n송금·인증·클릭을 멈춥니다.",
     action: "지금 메시지 점검하기",
     target: "s00",
     tone: "blue",
@@ -210,6 +211,7 @@ const LANDING_STAGES = [
     badge: "송금 직후",
     title: "송금 직후",
     description: "72시간 동안 신고·지급정지·\n증거 보존의 순서를 정리합니다.",
+    mobileDescription: "72시간 동안 신고·지급정지·\n증거 보존의 순서를 정리합니다.",
     action: "초기 대응 순서 보기",
     target: "workspace",
     tone: "orange",
@@ -219,6 +221,7 @@ const LANDING_STAGES = [
     badge: "계좌 정지 후",
     title: "계좌가 막힌 후",
     description: "거래·대화·문서를 연결해 금융회사가\n검토할 소명팩을 구성합니다.",
+    mobileDescription: "거래·대화·문서를 연결해\n지급정지 소명팩을 구성합니다.",
     action: "소명 준비 시작하기",
     target: "workspace",
     tone: "green",
@@ -1267,9 +1270,15 @@ function figmaSecondary(label, screen, attrs = {}) {
 
 function landingBrand() {
   const brand = setAttrs(button("", "landing-brand"), { "data-screen": "home", "aria-label": "FinGuard 홈" });
-  const mark = setAttrs(el("img", "landing-brand-mark"), { src: "/figma-brand-mark.svg", alt: "" });
+  const mark = setAttrs(el("img", "landing-brand-mark"), { src: "/figma-main-nav-brand.svg", alt: "" });
   append(brand, mark, el("span", "landing-brand-name", "FinGuard"));
   return brand;
+}
+
+function landingNavCta(label, className = "landing-nav-cta") {
+  const cta = setAttrs(screenButton("", "workspace", className), { "aria-label": label });
+  append(cta, setAttrs(el("img", "landing-nav-cta-bg"), { src: "/figma-main-nav-cta.svg", alt: "" }), el("span", "landing-nav-cta-label", label));
+  return cta;
 }
 
 function landingNavItem(item) {
@@ -1288,7 +1297,7 @@ function landingNavigation() {
   LANDING_NAV_ITEMS.forEach((item) => primary.append(landingNavItem(item)));
 
   const tools = el("div", "landing-nav-tools");
-  append(tools, el("span", "landing-extension", "불법추심 대응 · 확장"), screenButton("지급정지 소명 시작", "workspace", "landing-nav-cta"));
+  tools.append(landingNavCta("지급정지 소명 시작"));
 
   const menuToggle = button("", "landing-menu-toggle", {
     "data-action": "toggle-home-nav",
@@ -1298,12 +1307,12 @@ function landingNavigation() {
   });
   append(menuToggle, el("span", "landing-menu-line"), el("span", "landing-menu-line"), el("span", "landing-menu-line"));
   inner.append(landingBrand(), primary, tools, menuToggle);
-  header.append(inner);
+  header.append(inner, setAttrs(el("img", "landing-nav-divider"), { src: "/figma-main-nav-divider.svg", alt: "" }));
 
   if (state.homeNavOpen) {
     const mobileMenu = setAttrs(el("nav", "landing-mobile-menu"), { id: "landing-mobile-menu", "aria-label": "모바일 주요 메뉴" });
     LANDING_NAV_ITEMS.forEach((item) => mobileMenu.append(landingNavItem(item)));
-    append(mobileMenu, el("div", "landing-mobile-menu-divider"), el("span", "landing-extension landing-mobile-extension", "불법추심 대응 · 확장"), screenButton("지급정지 소명 시작", "workspace", "landing-mobile-cta"));
+    append(mobileMenu, el("div", "landing-mobile-menu-divider"), landingNavCta("지급정지 소명 시작", "landing-nav-cta landing-mobile-cta"));
     header.append(mobileMenu);
   }
   return header;
@@ -1311,7 +1320,9 @@ function landingNavigation() {
 
 function landingStageCard(stage) {
   const card = setAttrs(el("article", `landing-stage-card landing-stage-${stage.tone}`), { id: stage.id });
-  append(card, el("span", "landing-stage-badge", stage.badge), el("h3", "landing-stage-title", stage.title), el("p", "landing-stage-description", stage.description), screenButton(stage.action, stage.target, "landing-stage-action"));
+  const description = el("p", "landing-stage-description");
+  append(description, el("span", "landing-copy-desktop", stage.description), el("span", "landing-copy-mobile", stage.mobileDescription || stage.description));
+  append(card, el("span", "landing-stage-badge", stage.badge), el("h3", "landing-stage-title", stage.title), description, screenButton(stage.action, stage.target, "landing-stage-action"));
   return card;
 }
 
@@ -1323,16 +1334,22 @@ function renderLandingPage() {
   const hero = setAttrs(el("section", "landing-hero"), { id: "landing-hero" });
   const heroInner = el("div", "landing-container landing-hero-inner");
   const heroCopy = el("div", "landing-hero-copy");
-  append(heroCopy, el("span", "landing-kicker", "금융사고 대응 코파일럿"), el("h1", "landing-hero-title", "행동을 멈추고,\n증거를 잇습니다."), el("p", "landing-hero-description", "금융사고 전후의 흩어진 자료를 증거와 공식 다음 행동으로 바꿉니다."));
+  const heroTitle = el("h1", "landing-hero-title");
+  append(heroTitle, el("span", "landing-copy-desktop", "금융사고 전후의 흩어진 자료를\n증거와 공식 다음 행동으로 바꿉니다."), el("span", "landing-copy-mobile", "행동을 멈추고,\n증거를 잇습니다."));
+  const heroDescription = el("p", "landing-hero-description");
+  append(heroDescription, el("span", "landing-copy-desktop", "지금 겪는 상황에 맞춰 행동 전, 송금 직후, 계좌 정지 후 중 하나를 선택하세요.\n어느 단계에서 시작하든 같은 사건 엔진으로 이어집니다."), el("span", "landing-copy-mobile", "금융사고 전후의 흩어진 자료를\n증거와 공식 다음 행동으로 바꿉니다."));
+  append(heroCopy, el("span", "landing-kicker", "금융사고 대응 코파일럿"), heroTitle, heroDescription);
   const heroActions = el("div", "landing-hero-actions");
   append(heroActions, screenButton("행동 전 점검 시작", "s00", "landing-button landing-button-primary"), screenButton("지급정지 소명 준비", "workspace", "landing-button landing-button-secondary"));
-  heroCopy.append(heroActions);
+  heroCopy.append(heroActions, el("p", "landing-hero-note", "법률·금융기관의 최종 판단을 대체하지 않습니다."));
 
   const heroVisual = el("aside", "landing-hero-visual");
-  append(heroVisual, el("span", "landing-visual-kicker", "공통 사건 엔진"), el("h2", "landing-visual-title", "어느 단계에서 시작하든\n같은 구조로 정리됩니다."), el("p", "landing-visual-description", "대화·거래·문서를 연결하고, 사람이 확인할 다음 행동을 남깁니다."));
+  append(heroVisual, el("h2", "landing-visual-title", "하나의 사건 엔진"), el("p", "landing-visual-description", "입구는 달라도 결과 구조는 같습니다."));
   const visualFlow = el("div", "landing-visual-flow");
-  [["01", "사건 타임라인"], ["02", "증거 연결"], ["03", "누락자료"], ["04", "공식 다음 행동"]].forEach(([number, label]) => {
-    visualFlow.append(el("div", "landing-visual-step", el("span", "landing-visual-number", number), el("strong", "", label)));
+  [["행동 전", "행동 전", "송금·인증·클릭 중단", "danger"], ["송금 직후", "송금 직후", "72시간 대응 순서", "warning"], ["계좌 정지 후", "계좌 정지 후", "소명 증거팩 구성", "info"]].forEach(([badgeLabel, title, description, tone]) => {
+    const step = el("div", `landing-visual-step landing-visual-step-${tone}`);
+    append(step, el("span", "landing-visual-badge", badgeLabel), el("strong", "landing-visual-step-title", title), el("span", "landing-visual-step-description", description));
+    visualFlow.append(step);
   });
   heroVisual.append(visualFlow);
   heroInner.append(heroCopy, heroVisual);
@@ -1341,7 +1358,9 @@ function renderLandingPage() {
 
   const stages = setAttrs(el("section", "landing-section landing-stages"), { id: "landing-stages" });
   const stagesInner = el("div", "landing-container");
-  append(stagesInner, el("h2", "landing-section-title", "지금 어느 단계에 있나요?"), el("p", "landing-section-description", "상황을 선택하면 필요한 행동만 보여줍니다."));
+  const stagesDescription = el("p", "landing-section-description");
+  append(stagesDescription, el("span", "landing-copy-desktop", "상황을 선택하면 필요한 입력과 다음 행동만 보여줍니다."), el("span", "landing-copy-mobile", "상황을 선택하면 필요한 행동만 보여줍니다."));
+  append(stagesInner, el("h2", "landing-section-title", "지금 어느 단계에 있나요?"), stagesDescription);
   const stageGrid = el("div", "landing-stage-grid");
   LANDING_STAGES.forEach((stage) => stageGrid.append(landingStageCard(stage)));
   stagesInner.append(stageGrid);
@@ -1349,8 +1368,10 @@ function renderLandingPage() {
   main.append(stages);
 
   const engine = setAttrs(el("section", "landing-section landing-engine"), { id: "landing-engine" });
-  const engineInner = el("div", "landing-container");
-  append(engineInner, el("span", "landing-section-kicker", "공통 사건 엔진"), el("h2", "landing-engine-title", "어느 단계에서 시작하든\n동일한 검토 구조로 정리됩니다."));
+  const engineInner = el("div", "landing-container landing-engine-inner");
+  const engineTitle = el("h2", "landing-engine-title");
+  append(engineTitle, el("span", "landing-copy-desktop", "어느 단계에서 시작하든\n동일한 검토 구조로 정리됩니다."), el("span", "landing-copy-mobile", "어느 단계에서 시작하든\n같은 구조로 정리됩니다."));
+  append(engineInner, el("span", "landing-section-kicker", "공통 사건 엔진"), engineTitle);
   const engineGrid = el("div", "landing-engine-grid");
   [["01", "사건 타임라인", "날짜·금액·상대방을 시간순으로 정리"], ["02", "증거 연결", "대화·거래·문서를 같은 사건으로 연결"], ["03", "누락자료", "설명에 필요한데 빠진 자료를 표시"], ["04", "공식 다음 행동", "금융회사·기관에서 확인할 행동 제시"]].forEach(([number, title, description]) => {
     const card = el("article", "landing-engine-card");
@@ -1363,7 +1384,9 @@ function renderLandingPage() {
 
   const boundary = setAttrs(el("section", "landing-section landing-boundary"), { id: "landing-safety" });
   const boundaryInner = el("div", "landing-container");
-  append(boundaryInner, el("h2", "landing-boundary-title", "신뢰 가능한 금융 AI의 경계"), el("p", "landing-boundary-description", "FinGuard는 판단을 대신하지 않고, 판단 가능한 근거를 더 빠르게 만듭니다."));
+  const boundaryDescription = el("p", "landing-boundary-description");
+  append(boundaryDescription, el("span", "landing-copy-desktop", "FinGuard는 판단을 대신하지 않고, 판단 가능한 근거를 더 빠르게 만듭니다."), el("span", "landing-copy-mobile", "판단을 대신하지 않고, 판단 가능한 근거를 만듭니다."));
+  append(boundaryInner, el("h2", "landing-boundary-title", "신뢰 가능한 금융 AI의 경계"), boundaryDescription);
   const boundaryGrid = el("div", "landing-boundary-grid");
   [["✓", "FinGuard가 하는 일", "사건 구조화 · 근거 연결 · 누락자료 · 공식 다음 행동", "is-positive"], ["×", "FinGuard가 하지 않는 일", "사기 확정 · 법률 결론 · 문서 위조 · 기관 판단 대체", "is-negative"]].forEach(([icon, title, description, tone]) => {
     const card = el("article", `landing-boundary-card ${tone}`);

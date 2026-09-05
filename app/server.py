@@ -114,7 +114,7 @@ class FinGuardHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"cases": list(DEMO_CASES)})
         elif path == "/":
             self._serve_web_file("index.html")
-        elif path in {"/app.js", "/styles.css", "/favicon.svg", "/figma-brand-mark.svg", "/pitch.css", "/pitch.js"}:
+        elif path in {"/app.js", "/styles.css", "/favicon.svg", "/figma-brand-mark.svg", "/figma-main-nav-brand.svg", "/figma-main-nav-cta.svg", "/figma-main-nav-divider.svg", "/pitch.css", "/pitch.js"}:
             self._serve_web_file(path.lstrip("/"))
         elif path == "/pitch":
             self._serve_web_file("pitch.html")
