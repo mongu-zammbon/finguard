@@ -32,6 +32,11 @@ const state = {
   selectedFact: "F-001",
   reviewSubmitted: false,
   beforeNotice: "",
+  beforeInputMode: "screenshot",
+  beforeText: "",
+  beforeFileName: "",
+  beforeFile: null,
+  beforeAnalysis: null,
 };
 
 const ENTRY_MODES = {
@@ -450,6 +455,123 @@ function mockAnalyze(text) {
   return "LOW_RISK_NOT_PROOF";
 }
 
+const BEFORE_EVIDENCE_RULES = [
+  { label: "금전 요구", terms: ["송금", "이체", "입금", "보내", "안전계좌", "돈"], detail: "금융 행동을 요구" },
+  { label: "시간 압박", terms: ["지금", "즉시", "긴급", "오늘", "30분", "빨리", "마감"], detail: "확인·상담할 시간을 줄임" },
+  { label: "비밀 요구", terms: ["말하지", "말하지마", "비밀", "혼자", "은행에는"], detail: "주변이나 공식 채널에 알리지 않게 유도" },
+  { label: "비공식 경로", terms: ["링크", "url", "http://", "https://", "개인 연락처", "메시지 속 번호"], detail: "메시지 속 경로로 바로 행동을 유도" },
+  { label: "기관 사칭", terms: ["금융감독원", "검찰", "경찰", "은행", "고객센터", "보안팀"], detail: "기관을 내세워 요청을 믿게 함" },
+  { label: "인증정보 요구", terms: ["인증번호", "비밀번호", "otp", "주민번호", "계좌번호"], detail: "민감한 정보를 입력하게 유도" },
+  { label: "위협·압박", terms: ["범죄에 연루", "압류", "정지", "처벌", "수사", "체포"], detail: "불이익을 암시해 즉시 행동을 압박" },
+];
+
+function findBeforeTerm(text, terms) {
+  const clean = text.toLowerCase();
+  return terms.find((term) => clean.includes(term.toLowerCase())) || "";
+}
+
+function beforeTextEvidence(text) {
+  return BEFORE_EVIDENCE_RULES
+    .map((rule) => {
+      const term = findBeforeTerm(text, rule.terms);
+      if (!term) return null;
+      const quote = term.length > 12 ? `${term.slice(0, 12)}…` : `${term}…`;
+      return { label: rule.label, value: `“${quote}”\n${rule.detail}` };
+    })
+    .filter(Boolean)
+    .slice(0, 3);
+}
+
+function createBeforeTextAnalysis(text) {
+  const label = mockAnalyze(text);
+  return { label, source: "text", evidence: beforeTextEvidence(text), inputLength: text.length };
+}
+
+function createBeforeFileAnalysis(file) {
+  return {
+    label: "DANGER",
+    source: "file",
+    fileName: file.name,
+    evidence: [
+      { label: "금전 요구", value: "“입금하지 않으면…”\n해제 조건으로 돈을 요구" },
+      { label: "시간 압박", value: "“30분 안에…”\n확인·상담할 시간을 줄임" },
+      { label: "비공식 경로", value: "메시지 번호·링크로\n바로 행동을 유도" },
+    ],
+  };
+}
+
+function beforeResultPresentation(analysis) {
+  const count = analysis?.evidence?.length || 0;
+  const presentations = {
+    DANGER: {
+      stopClass: "danger",
+      stop: "STOP · 지금 송금·인증·클릭을 멈추세요",
+      title: "지금은 멈추세요",
+      intro: `메시지 원문에서 ${count || 1}가지 위험 신호를 확인했습니다.`,
+      actions: ["송금·인증·클릭 중단", "메시지 속 번호·링크 사용 금지", "은행 앱·공식 대표번호로 직접 확인"],
+    },
+    CAUTION: {
+      stopClass: "caution",
+      stop: "CHECK · 행동 전에 한 번 더 확인하세요",
+      title: "추가 확인이 필요합니다",
+      intro: "현재 입력에서 주의해서 볼 신호를 확인했습니다.",
+      actions: ["추가 송금·인증·클릭 보류", "메시지 속 번호·링크 사용 금지", "은행 앱·공식 대표번호로 직접 확인"],
+    },
+    LOW_RISK_NOT_PROOF: {
+      stopClass: "low-risk",
+      stop: "CHECK · 낮은 위험은 안전 증명이 아닙니다",
+      title: "안전하다고 확정하지 마세요",
+      intro: "현재 입력에서 뚜렷한 위험 신호는 적지만, 안전을 확정할 수 없습니다.",
+      actions: ["금융 행동 전 잠시 보류", "메시지 속 번호·링크 사용 금지", "은행 앱·공식 대표번호로 직접 확인"],
+    },
+    ABSTAIN: {
+      stopClass: "abstain",
+      stop: "HOLD · 정보가 더 필요합니다",
+      title: "판단을 보류합니다",
+      intro: "현재 입력만으로는 위험 여부를 구분하기 어렵습니다.",
+      actions: ["송금·인증·클릭 보류", "원문과 요청 맥락 다시 확인", "공식 채널이나 사람에게 문의"],
+    },
+    INJECTION_DETECTED: {
+      stopClass: "injection",
+      stop: "STOP · 입력 안의 지시문을 따르지 마세요",
+      title: "입력 지시문을 격리하세요",
+      intro: "메시지 안에서 분석을 흔드는 지시문을 확인했습니다.",
+      actions: ["비밀번호·인증번호 입력 금지", "메시지 안의 지시문 무시", "원문 사실만 공식 채널에서 확인"],
+    },
+  };
+  return presentations[analysis?.label] || presentations.ABSTAIN;
+}
+
+function resetBeforeFlow() {
+  state.beforeInputMode = "screenshot";
+  state.beforeText = "";
+  state.beforeFileName = "";
+  state.beforeFile = null;
+  state.beforeAnalysis = null;
+  state.beforeNotice = "";
+}
+
+function runBeforeAnalysis() {
+  if (state.busy) return;
+  const text = state.beforeInputMode === "direct" ? state.beforeText.trim() : "";
+  const file = state.beforeInputMode === "screenshot" ? state.beforeFile : null;
+  if (!text && !file) {
+    state.beforeNotice = "메시지를 입력하거나 스크린샷을 선택해 주세요.";
+    render();
+    return;
+  }
+
+  state.busy = true;
+  state.beforeNotice = "";
+  render();
+  window.setTimeout(() => {
+    state.beforeAnalysis = file ? createBeforeFileAnalysis(file) : createBeforeTextAnalysis(text);
+    state.variant = state.beforeAnalysis.label;
+    state.busy = false;
+    navigate("before-result");
+  }, 180);
+}
+
 function parseHash() {
   const raw = window.location.hash.replace(/^#/, "");
   if (!raw) return;
@@ -458,6 +580,11 @@ function parseHash() {
     state.screen = screen;
   }
   if (screen === "before" || screen === "before-result") state.entryFlow = "before";
+  if (screen === "before-result" && !state.beforeAnalysis) {
+    state.screen = "before";
+    state.beforeNotice = "먼저 메시지를 입력하거나 스크린샷을 선택해 주세요.";
+    writeHash();
+  }
   if (screen === "g02" && RESULT_STATES[value]) state.variant = value;
   if (screen === "g01" && value === "DIRECT_INPUT") state.entryMode = "direct";
   if (screen === "g01" && value !== "DIRECT_INPUT") state.entryMode = "screenshot";
@@ -530,7 +657,7 @@ function renderOverview() {
   page.append(flow);
 
   const lower = el("div", "overview-lower");
-  const scope = panel("이번 프론트 범위", "실제 서버·로그인·장기 저장 없이 화면과 전환만 재현합니다.", "scope-panel");
+  const scope = panel("이번 프론트 범위", "실제 서버·로그인·장기 저장 없이 입력·분석·전환을 프론트에서 재현합니다.", "scope-panel");
   const scopeList = el("ul", "check-list");
   ["S00/G01/G02 4개 상태/G03", "C01~C08 User Workspace v3", "R01~R06 Reviewer Workspace v3", "03_Components & States 토큰·상태·접근성"].forEach((item) => scopeList.append(el("li", "", item)));
   scope.append(scopeList, el("p", "scope-note", "화면 안의 입력과 사건은 새로고침하면 사라지는 mock 상태입니다."));
@@ -1632,41 +1759,59 @@ function renderBeforeCapture() {
   );
 
   const tabs = el("div", "before-capture-tabs");
-  append(tabs, el("span", "before-capture-tab is-active", "스크린샷"), el("span", "before-capture-tab", "직접 입력"));
+  append(
+    tabs,
+    actionButton("스크린샷", "before-mode", `before-capture-tab ${state.beforeInputMode === "screenshot" ? "is-active" : ""}`.trim(), { "data-mode": "screenshot", "aria-pressed": String(state.beforeInputMode === "screenshot") }),
+    actionButton("직접 입력", "before-mode", `before-capture-tab ${state.beforeInputMode === "direct" ? "is-active" : ""}`.trim(), { "data-mode": "direct", "aria-pressed": String(state.beforeInputMode === "direct") }),
+  );
   body.append(tabs);
 
-  const upload = el("label", "before-capture-upload");
-  const input = setAttrs(el("input", "file-input"), { id: "before-screenshot-input", type: "file", accept: "image/*" });
-  append(upload, el("span", "before-capture-upload-icon", "↑"), el("strong", "", "문자·메시지 화면 업로드"), el("small", "", state.screenshotName || "PNG · JPG · 최대 10MB"), input);
-  body.append(upload, el("h2", "before-capture-sample-label", "입력 예시 · 실제 메시지 아님"));
+  if (state.beforeInputMode === "screenshot") {
+    const upload = el("label", "before-capture-upload");
+    const input = setAttrs(el("input", "file-input"), { id: "before-screenshot-input", type: "file", accept: "image/*" });
+    append(upload, el("span", "before-capture-upload-icon", "↑"), el("strong", "", "문자·메시지 화면 업로드"), el("small", "", state.beforeFileName || "PNG · JPG · 최대 10MB"), input);
+    body.append(upload);
+  } else {
+    const input = setAttrs(el("textarea", "before-capture-direct-input"), { id: "before-message", maxlength: 8000, placeholder: "의심 메시지 내용을 붙여넣으세요.", "aria-label": "점검할 메시지" });
+    input.value = state.beforeText;
+    body.append(input, el("div", "before-capture-direct-meta", `${state.beforeText.length.toLocaleString()} / 8,000`));
+  }
+  body.append(el("h2", "before-capture-sample-label", "입력 예시 · 실제 메시지 아님"));
 
   const sample = el("div", "before-capture-sample");
   const sampleCopy = el("div", "before-capture-sample-copy");
   append(sampleCopy, el("p", "", "예시: “30분 안에 입금하지 않으면…”"), el("p", "", "→ 시간 제한 + 금전 요구를 확인합니다."));
   append(sample, sampleCopy, actionButton("예시 보기", "before-example", "before-capture-sample-chip"));
   body.append(sample, el("div", "before-capture-privacy", "업로드한 원문은 결과 확인 후 보관하지 않습니다."));
-  body.append(actionButton("메시지 점검하기", "before-check", "button figma-primary before-capture-primary"));
+  body.append(actionButton(state.busy ? "분석 중…" : "메시지 점검하기", "before-check", "button figma-primary before-capture-primary", { disabled: state.busy, "aria-busy": String(state.busy) }));
   body.append(actionButton("이미 계좌가 막혔다면  계좌 정지 후 →", "before-freeze", "before-capture-alt"));
   body.append(el("p", "before-capture-disclaimer", "위험 신호 참고용 · 사기 여부를 확정하지 않습니다."));
-  if (state.beforeNotice) body.append(el("p", "before-capture-notice", state.beforeNotice));
+  if (state.beforeNotice) body.append(setAttrs(el("p", "before-capture-notice", state.beforeNotice), { role: "status", "aria-live": "polite" }));
   return beforeMobileFrame("BEFORE", body, "before-capture-mobile");
 }
 
 function renderBeforeResult() {
+  if (!state.beforeAnalysis) return renderBeforeCapture();
+  const analysis = state.beforeAnalysis;
+  const presentation = beforeResultPresentation(analysis);
   const body = el("div", "figma-screen-content before-result-content");
-  append(body, el("div", "before-result-stop", "STOP · 지금 송금·인증·클릭을 멈추세요"), el("h1", "before-result-title", "지금은 멈추세요"), el("p", "before-result-intro", "메시지 원문에서 3가지 위험 신호를 확인했습니다."));
+  append(body, el("div", `before-result-stop before-result-stop-${presentation.stopClass}`, presentation.stop), el("h1", "before-result-title", presentation.title), el("p", "before-result-intro", presentation.intro));
 
   const evidence = el("section", "before-result-evidence");
   evidence.append(el("h2", "before-result-section-title", "메시지에서 확인된 근거"));
   const evidenceList = el("div", "before-result-evidence-list");
-  evidenceList.append(beforeResultEvidence("금전 요구", "“입금하지 않으면…”\n해제 조건으로 돈을 요구"), beforeResultEvidence("시간 압박", "“30분 안에…”\n확인·상담할 시간을 줄임"), beforeResultEvidence("비공식 경로", "메시지 번호·링크로\n바로 행동을 유도"));
+  if (analysis.evidence.length) {
+    analysis.evidence.forEach(({ label, value }) => evidenceList.append(beforeResultEvidence(label, value)));
+  } else {
+    evidenceList.append(el("div", "before-result-empty-evidence", "뚜렷한 위험 신호가 확인되지 않았습니다.\n안전하다는 뜻은 아닙니다."));
+  }
   evidence.append(evidenceList);
   body.append(evidence);
 
   const nextActions = el("section", "before-result-next-actions");
   append(nextActions, el("h2", "before-result-next-title", "지금 할 일"));
   const list = el("ol", "before-result-next-list");
-  ["송금·인증·클릭 중단", "메시지 속 번호·링크 사용 금지", "은행 앱·공식 대표번호로 직접 확인"].forEach((item) => list.append(el("li", "", item)));
+  presentation.actions.forEach((item) => list.append(el("li", "", item)));
   nextActions.append(list);
   body.append(nextActions);
 
@@ -1674,6 +1819,7 @@ function renderBeforeResult() {
   append(actions, figmaPrimary("공식 채널에서 확인하기", "before-verify", { "aria-describedby": "before-result-note" }), actionButton("다른 메시지 점검하기", "before-capture", "button figma-secondary"));
   body.append(actions);
   if (state.beforeNotice) body.append(setAttrs(el("p", "before-result-notice", state.beforeNotice), { role: "status", "aria-live": "polite" }));
+  if (analysis.source === "file") body.append(el("p", "before-result-source-note", `프론트 MVP 데모 · ${analysis.fileName}을 선택한 입력으로 처리했습니다. 실제 OCR 연동 전 단계입니다.`));
   body.append(el("p", "before-result-note", "위험 신호 참고용 · 최종 확인은 공식 채널과 상담으로 진행하세요."));
   return beforeMobileFrame("RESULT", body, "before-result-mobile");
 }
@@ -1923,6 +2069,7 @@ document.addEventListener("click", (event) => {
       state.message = item.text;
       state.notice = "";
     }
+    if (screenTarget.dataset.screen === "before") resetBeforeFlow();
     navigate(screenTarget.dataset.screen);
     return;
   }
@@ -1943,6 +2090,10 @@ document.addEventListener("click", (event) => {
   } else if (action === "entry-mode") {
     state.entryMode = target.dataset.mode || "share";
     if (state.screen === "g01") writeHash();
+    render();
+  } else if (action === "before-mode") {
+    state.beforeInputMode = target.dataset.mode === "direct" ? "direct" : "screenshot";
+    state.beforeNotice = "";
     render();
   } else if (action === "advance-workspace") {
     const nextScreen = target.dataset.nextScreen;
@@ -1974,19 +2125,20 @@ document.addEventListener("click", (event) => {
     state.beforeNotice = "";
     navigate(state.entryFlow === "before" ? "before" : "c01");
   } else if (action === "before-example") {
-    state.message = FIGMA_SAMPLE_TEXT;
+    state.beforeInputMode = "direct";
+    state.beforeText = FIGMA_SAMPLE_TEXT;
+    state.beforeFile = null;
+    state.beforeFileName = "";
     state.beforeNotice = "예시 메시지를 불러왔습니다. 메시지 점검하기를 눌러주세요.";
     render();
   } else if (action === "before-check") {
-    state.variant = "DANGER";
-    state.beforeNotice = "";
-    navigate("before-result");
+    runBeforeAnalysis();
   } else if (action === "before-freeze") {
     state.entryFlow = "freeze";
     state.beforeNotice = "";
     navigate("s00");
   } else if (action === "before-capture") {
-    state.beforeNotice = "";
+    resetBeforeFlow();
     navigate("before");
   } else if (action === "before-verify") {
     state.beforeNotice = "메시지 속 연락처가 아닌 공식 앱이나 대표번호로 직접 확인하세요.";
@@ -2013,6 +2165,16 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("input", (event) => {
+  if (event.target.id === "before-message") {
+    state.beforeText = event.target.value.slice(0, 8000);
+    if (state.beforeNotice) {
+      state.beforeNotice = "";
+      document.querySelector(".before-capture-notice")?.remove();
+    }
+    const count = document.querySelector(".before-capture-direct-meta");
+    if (count) count.textContent = `${state.beforeText.length.toLocaleString()} / 8,000`;
+    return;
+  }
   if (event.target.id === "message") {
     state.message = event.target.value.slice(0, 8000);
     const count = document.querySelector(".char-count");
@@ -2026,9 +2188,30 @@ document.addEventListener("change", (event) => {
     return;
   }
   if (event.target.id === "before-screenshot-input") {
-    state.screenshotName = event.target.files?.[0]?.name || "";
-    const label = event.target.closest(".before-capture-upload")?.querySelector("small");
-    if (label) label.textContent = state.screenshotName || "PNG · JPG · 최대 10MB";
+    const file = event.target.files?.[0];
+    state.beforeFile = null;
+    state.beforeFileName = "";
+    if (!file) {
+      state.beforeNotice = "스크린샷을 선택해 주세요.";
+      render();
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      event.target.value = "";
+      state.beforeNotice = "이미지 파일만 선택해 주세요.";
+      render();
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      event.target.value = "";
+      state.beforeNotice = "스크린샷은 10MB 이하로 선택해 주세요.";
+      render();
+      return;
+    }
+    state.beforeFile = file;
+    state.beforeFileName = file.name;
+    state.beforeNotice = "스크린샷을 선택했습니다. 메시지 점검하기를 눌러주세요.";
+    render();
     return;
   }
   if (event.target.id === "screenshot-input") {

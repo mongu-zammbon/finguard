@@ -529,13 +529,16 @@ a { color: inherit; }
 .before-capture-title { min-height: 62px; margin: 8px 0 0; color: #171f30; font-size: 23px; font-weight: 800; line-height: 29px; letter-spacing: -.075em; white-space: pre-line; }
 .before-capture-intro { min-height: 38px; margin: 8px 0 0; color: #616e82; font-size: 11px; line-height: 15px; white-space: pre-line; }
 .before-capture-tabs { display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 38px; margin-top: 12px; padding: 2px; border: 1px solid #f5f7fa; border-radius: 12px; background: #f5f7fa; }
-.before-capture-tab { display: grid; place-items: center; border-radius: 8px; color: #616e82; font-size: 10px; font-weight: 600; }
+.before-capture-tab { display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #616e82; cursor: pointer; font-size: 10px; font-weight: 600; }
 .before-capture-tab.is-active { border: 1px solid #d6e0ed; background: #fff; color: #171f30; }
 .before-capture-upload { display: grid; place-items: center; gap: 6px; width: 100%; height: 106px; margin-top: 14px; padding: 12px; border: 1px solid #d6e0ed; border-radius: 12px; background: #f5f7fa; cursor: pointer; text-align: center; }
 .before-capture-upload:hover { border-color: #1a61d6; }
 .before-capture-upload-icon { display: grid; place-items: center; width: 42px; height: 24px; border-radius: 12px; background: #edf5ff; color: #1a61d6; font-size: 14px; font-weight: 800; line-height: 14px; }
 .before-capture-upload strong { color: #171f30; font-size: 12px; line-height: 15px; }
 .before-capture-upload small { color: #616e82; font-size: 10px; line-height: 13px; }
+.before-capture-direct-input { width: 100%; height: 106px; margin-top: 14px; padding: 13px; border: 1px solid #d6e0ed; border-radius: 12px; outline: 0; background: #f5f7fa; color: #171f30; font-size: 11px; line-height: 17px; resize: none; }
+.before-capture-direct-input:focus { border-color: #1a61d6; box-shadow: 0 0 0 3px #1a61d61f; }
+.before-capture-direct-meta { height: 0; margin-top: -18px; padding-right: 13px; color: #616e82; font-size: 9px; line-height: 13px; text-align: right; }
 .before-capture-sample-label { height: 16px; margin: 18px 0 0; color: #171f30; font-size: 10px; font-weight: 800; line-height: 13px; }
 .before-capture-sample { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; width: 100%; height: 84px; margin-top: 6px; padding: 13px; border: 1px solid #d6e0ed; border-radius: 12px; background: #edf5ff; }
 .before-capture-sample-copy { min-width: 0; color: #171f30; font-size: 11px; line-height: 17px; }
@@ -545,18 +548,24 @@ a { color: inherit; }
 .before-capture-privacy { display: flex; align-items: center; width: 100%; height: 48px; margin-top: 16px; padding: 0 13px; border-radius: 12px; background: #edf5ff; color: #1a61d6; font-size: 10px; font-weight: 600; line-height: 13px; }
 .before-capture-primary { width: 100%; height: 44px; min-height: 44px; margin-top: 24px; border-radius: 9px; background: #1a61d6; font-size: 12px; line-height: 16px; }
 .before-capture-primary:hover { background: #1554bc; }
+.before-capture-primary:disabled { cursor: wait; opacity: .72; }
 .before-capture-alt { width: 100%; min-height: 18px; margin-top: 18px; padding: 0; border: 0; background: transparent; color: #1a61d6; font-size: 10px; font-weight: 600; line-height: 13px; text-align: left; }
 .before-capture-alt:hover { background: transparent; color: #1554bc; }
 .before-capture-disclaimer { min-height: 28px; margin: 20px 0 0; color: #616e82; font-size: 9px; line-height: 12px; }
 .before-capture-notice, .before-result-notice { margin: 10px 0 0; color: #1a61d6; font-size: 10px; line-height: 14px; }
 .before-result-mobile .figma-mobile-body { padding-top: 14px; }
 .before-result-stop { display: flex; align-items: center; width: 100%; height: 52px; padding: 0 13px; border: 1px solid #ffb8ad; border-radius: 12px; background: #fff0eb; color: #c21a12; font-size: 11px; font-weight: 800; line-height: 15px; }
+.before-result-stop-caution { border-color: #fedf89; background: #fffaeb; color: #b54708; }
+.before-result-stop-low-risk { border-color: #b2ddff; background: #eff8ff; color: #175cd3; }
+.before-result-stop-abstain { border-color: #fedf89; background: #fffaeb; color: #b54708; }
+.before-result-stop-injection { border-color: #b2ddff; background: #eff8ff; color: #175cd3; }
 .before-result-title { height: 30px; margin: 18px 0 0; color: #171f30; font-size: 23px; font-weight: 800; line-height: 28px; letter-spacing: -.075em; }
 .before-result-intro { height: 18px; margin: 8px 0 0; color: #616e82; font-size: 11px; line-height: 14px; }
 .before-result-evidence { margin-top: 22px; }
 .before-result-section-title { height: 18px; margin: 0; color: #171f30; font-size: 12px; font-weight: 800; line-height: 15px; }
 .before-result-evidence-list { display: grid; gap: 10px; margin-top: 10px; }
 .before-result-evidence-item { display: grid; grid-template-columns: 8px 88px minmax(0, 1fr); gap: 10px; align-items: start; width: 100%; height: 54px; padding: 7px 11px; border: 1px solid #d6e0ed; border-radius: 12px; background: #fff; }
+.before-result-empty-evidence { display: flex; align-items: center; width: 100%; height: 54px; padding: 7px 11px; border: 1px solid #d6e0ed; border-radius: 12px; background: #fff; color: #616e82; font-size: 10px; line-height: 14px; white-space: pre-line; }
 .before-result-evidence-dot { width: 8px; height: 8px; margin-top: 6px; border-radius: 4px; background: #c21a12; }
 .before-result-evidence-label { color: #171f30; font-size: 10px; line-height: 14px; }
 .before-result-evidence-value { min-width: 0; color: #616e82; font-size: 11px; line-height: 14px; white-space: pre-line; }
@@ -569,6 +578,7 @@ a { color: inherit; }
 .before-result-actions .figma-primary:hover { background: #1554bc; }
 .before-result-actions .figma-secondary { font-size: 12px; }
 .before-result-note { height: 30px; margin: 17px 0 0; color: #616e82; font-size: 9px; line-height: 12px; }
+.before-result-source-note { margin: 14px 0 0; color: #616e82; font-size: 9px; line-height: 12px; }
 
 @media (max-width: 680px) {
   .figma-before-mobile { border-radius: 0; }

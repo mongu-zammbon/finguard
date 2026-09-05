@@ -67,7 +67,7 @@ class ServerContractTests(unittest.TestCase):
             self.assertIn(f'"{screen}"', app_js)
         self.assertIn("figma-mobile-screen", app_js)
         self.assertIn("figma-desktop-frame", app_js)
-        for copy in ("BEFORE · 행동 직전", "메시지 점검하기", "공식 채널에서 확인하기"):
+        for copy in ("BEFORE · 행동 직전", "메시지 점검하기", "공식 채널에서 확인하기", "runBeforeAnalysis", "before-message", "before-screenshot-input"):
             self.assertIn(copy, app_js)
 
     def test_service_starts_with_responsive_main_navigation(self) -> None:
