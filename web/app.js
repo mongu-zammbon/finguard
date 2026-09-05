@@ -18,6 +18,7 @@ const state = {
   reviewScreen: "R01",
   entryMode: "screenshot",
   workspaceScreen: "c01",
+  workspaceProgress: 0,
   message: "",
   selectedCase: "danger-transfer",
   consentChoice: "none",
@@ -184,6 +185,21 @@ const CASE_SCREENS = [
   ["c07", "C07", "Report Evidence Index", "증거 인덱스"],
   ["c08", "C08", "Resubmission", "재제출"],
 ];
+
+const WORKSPACE_STEPS = [
+  { id: "c01", label: "개요", routes: ["c01"] },
+  { id: "c02", label: "자료 수집", routes: ["c02"] },
+  { id: "c03", label: "AI 사실 확인", routes: ["c03"] },
+  { id: "c04", label: "거래 연결", routes: ["c04"] },
+  { id: "c05", label: "이슈 검토", routes: ["c05a", "c05b"] },
+  { id: "c06", label: "타임라인", routes: ["c06"] },
+  { id: "c07", label: "보고서", routes: ["c07"] },
+  { id: "c08", label: "자료 보완", routes: ["c08"] },
+];
+
+function workspaceStepIndex(screen) {
+  return WORKSPACE_STEPS.findIndex((step) => step.routes.includes(screen));
+}
 
 const REVIEW_SCREENS = [
   ["R01", "Review Queue", "검토 큐"],
@@ -1309,7 +1325,7 @@ function renderActualC01Mobile() {
   ], "자료 상태"));
   body.append(figmaCallout("먼저 확인할 것", "원문 확인 전 제출 · 송금 · 인증정보 전달", "danger"), figmaCallout("독립적으로 확인", "이용 중인 은행의 공식 앱 또는 대표번호", "info"));
   const actions = el("div", "figma-mobile-actions");
-  append(actions, figmaPrimary("자료 상태 확인", "screen", { "data-screen": "c02" }), figmaSecondary("나중에 확인", "workspace", { "data-case-screen": "c01" }));
+  append(actions, figmaPrimary("자료 상태 확인", "advance-workspace", { "data-next-screen": "c02" }), figmaSecondary("나중에 확인", "workspace", { "data-case-screen": "c01" }));
   body.append(actions);
   return figmaMobileFrame("1 / 7", body, "figma-case-mobile");
 }
@@ -1331,12 +1347,30 @@ function renderActualC03Mobile() {
 }
 
 function workspaceRail(active) {
-  const rail = el("aside", "figma-service-rail");
+  const rail = setAttrs(el("aside", "figma-service-rail"), { "data-workspace-screen": active });
   append(rail, el("div", "figma-rail-brand", el("span", "figma-rail-mark", "F"), el("strong", "", "FinGuard")), el("span", "figma-rail-caption", "CASE WORKSPACE"), el("strong", "figma-rail-case", "FG-2026-A001"), el("span", "figma-rail-subtitle", "온라인 물품 판매"));
-  const nav = setAttrs(el("nav", "figma-rail-nav"), { "aria-label": "Case Workspace" });
-  [["c01", "개요"], ["c02", "증거"], ["c03", "사실"], ["c04", "거래"], ["c05a", "이슈 A"], ["c05b", "이슈 B"], ["c06", "타임라인"], ["c07", "보고서"], ["c08", "재제출"]].forEach(([screen, label]) => {
-    const item = button(label, `figma-rail-item ${active === screen ? "is-active" : ""}`.trim(), { "data-screen": "workspace", "data-case-screen": screen });
-    nav.append(item);
+  const nav = setAttrs(el("nav", "figma-rail-nav figma-stepper-nav"), { "aria-label": "사건 진행 단계" });
+  const activeIndex = workspaceStepIndex(active);
+  const reachableThrough = Math.max(state.workspaceProgress, activeIndex);
+  WORKSPACE_STEPS.forEach((step, index) => {
+    const route = step.routes.includes(active) ? active : step.routes[0];
+    const locked = index > reachableThrough;
+    const complete = index < state.workspaceProgress;
+    const wrapper = el("div", "figma-step-wrap");
+    const item = button("", `figma-rail-item figma-step-item ${activeIndex === index ? "is-active" : ""} ${complete ? "is-complete" : ""} ${locked ? "is-locked" : ""}`.trim(), {
+      "data-screen": "workspace",
+      "data-case-screen": route,
+      "data-workspace-step": step.id,
+      "aria-label": `${String(index + 1).padStart(2, "0")} ${step.label}${locked ? " (잠김)" : ""}`,
+      "aria-current": activeIndex === index ? "step" : undefined,
+      "aria-disabled": locked,
+      title: locked ? "이전 단계를 완료하면 열 수 있습니다." : undefined,
+      disabled: locked,
+    });
+    append(item, el("span", "figma-step-marker", complete ? "✓" : String(index + 1).padStart(2, "0")), el("span", "figma-step-label", step.label), el("span", "figma-step-status", locked ? "잠김" : complete ? "완료" : activeIndex === index ? "진행 중" : ""));
+    wrapper.append(item);
+    if (index < WORKSPACE_STEPS.length - 1) wrapper.append(el("span", `figma-step-arrow ${index < reachableThrough ? "is-reached" : "is-locked"}`, "↓"));
+    nav.append(wrapper);
   });
   rail.append(nav, el("div", "figma-rail-footer", figmaBadge("v3", "figma-badge-blue"), el("span", "", "사건 업무 화면")));
   return rail;
@@ -1351,12 +1385,26 @@ function reviewerRail(active) {
   return rail;
 }
 
+function workspaceStepFooter(active) {
+  const index = workspaceStepIndex(active);
+  const next = WORKSPACE_STEPS[index + 1];
+  const footer = setAttrs(el("section", "figma-step-footer"), { "aria-label": "사건 진행 상태" });
+  if (!next) {
+    append(footer, el("div", "figma-step-footer-copy", el("span", "figma-step-footer-kicker", "진행 완료"), el("strong", "figma-step-footer-title", "사건 단계 확인이 끝났습니다.")));
+    return footer;
+  }
+  const nextRoute = next.routes[0];
+  append(footer, el("div", "figma-step-footer-copy", el("span", "figma-step-footer-kicker", `현재 단계 ${index + 1} / ${WORKSPACE_STEPS.length}`), el("strong", "figma-step-footer-title", `다음 단계 · ${next.label}`), el("p", "figma-step-footer-description", "다음 단계를 확인하면 사이드바에서 이후 화면이 열립니다.")), actionButton(`다음 단계: ${next.label}`, "advance-workspace", "button figma-step-next", { "data-next-screen": nextRoute }));
+  return footer;
+}
+
 function figmaDesktopFrame(rail, title, subtitle, content, className = "") {
   const frame = el("div", `figma-desktop-frame ${className}`.trim());
   const main = el("main", "figma-desktop-main");
   const header = el("header", "figma-desktop-header");
   append(header, el("div", "figma-desktop-header-copy", el("span", "figma-desktop-kicker", "FinGuard"), el("h1", "figma-desktop-title", title), el("p", "figma-desktop-subtitle", subtitle)), figmaBadge("사람 확인 필요", "figma-badge-warning"));
   main.append(header, content);
+  if (rail.dataset.workspaceScreen) main.append(workspaceStepFooter(rail.dataset.workspaceScreen));
   frame.append(rail, main);
   return frame;
 }
@@ -1390,7 +1438,7 @@ function renderActualC01Desktop() {
   const summary = figmaDesktopSection("사건 요약", "Gate에서 보관 동의한 첫 번째 증거를 기준으로 정리합니다.");
   ["사건 · 정상거래 + 통장협박", "현재 상태 · 일부 원문 확인 필요", "다음 단계 · C03에서 사실과 원문 비교"].forEach((item) => summary.append(el("div", "figma-summary-row", item)));
   const action = figmaDesktopSection("우선 확인", "먼저 확인할 항목을 한 곳에서 봅니다.");
-  action.append(figmaCallout("먼저 확인할 것", "원문 확인 전 제출 · 송금 · 인증정보 전달", "danger"), figmaPrimary("사실 검토 열기", "screen", { "data-screen": "workspace", "data-case-screen": "c03" }));
+  action.append(figmaCallout("먼저 확인할 것", "원문 확인 전 제출 · 송금 · 인증정보 전달", "danger"));
   grid.append(summary, action);
   content.append(grid);
   const activity = figmaDesktopSection("최근 활동", "사건에 연결된 원문과 확인 상태");
@@ -1455,6 +1503,11 @@ function renderActualC04Desktop() {
 function renderActualC05Desktop(conflict = false) {
   const screen = conflict ? "c05b" : "c05a";
   const content = el("div", "figma-desktop-content");
+  const branchTabs = el("div", "figma-branch-tabs");
+  [["c05a", "사건 A · 기본"], ["c05b", "사건 B · 상충"]].forEach(([route, label]) => {
+    branchTabs.append(button(label, `figma-branch-tab ${screen === route ? "is-active" : ""}`.trim(), { "data-screen": "workspace", "data-case-screen": route, "aria-current": screen === route ? "page" : undefined }));
+  });
+  content.append(branchTabs);
   if (conflict) {
     content.append(figmaCallout("상충 자료", "사용자 진술과 거래 자료의 시간·금액이 일치하지 않습니다.", "danger"));
     const columns = el("div", "figma-two-column");
@@ -1597,6 +1650,12 @@ document.addEventListener("click", (event) => {
   const screenTarget = event.target.closest("[data-screen]");
   if (screenTarget) {
     event.preventDefault();
+    if (screenTarget.dataset.workspaceStep) {
+      const targetIndex = workspaceStepIndex(screenTarget.dataset.caseScreen);
+      const activeScreen = state.screen === "workspace" ? state.workspaceScreen : state.screen;
+      const availableThrough = Math.max(state.workspaceProgress, workspaceStepIndex(activeScreen));
+      if (targetIndex > availableThrough) return;
+    }
     if (screenTarget.dataset.variant && RESULT_STATES[screenTarget.dataset.variant]) state.variant = screenTarget.dataset.variant;
     if (screenTarget.dataset.reviewScreen) state.reviewScreen = screenTarget.dataset.reviewScreen;
     if (screenTarget.dataset.caseScreen && CASE_SCREENS.some(([id]) => id === screenTarget.dataset.caseScreen)) state.workspaceScreen = screenTarget.dataset.caseScreen;
@@ -1619,6 +1678,15 @@ document.addEventListener("click", (event) => {
     state.entryMode = target.dataset.mode || "share";
     if (state.screen === "g01") writeHash();
     render();
+  } else if (action === "advance-workspace") {
+    const nextScreen = target.dataset.nextScreen;
+    const currentScreen = state.screen === "workspace" ? state.workspaceScreen : state.screen;
+    const currentIndex = workspaceStepIndex(currentScreen);
+    const nextIndex = workspaceStepIndex(nextScreen);
+    if (currentIndex < 0 || nextIndex !== currentIndex + 1) return;
+    state.workspaceProgress = Math.max(state.workspaceProgress, nextIndex);
+    state.workspaceScreen = nextScreen;
+    navigate("workspace");
   } else if (action === "open-consent") {
     navigate("g03");
   } else if (action === "analyze-sample") {

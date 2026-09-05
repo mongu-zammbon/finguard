@@ -88,6 +88,14 @@ class ServerContractTests(unittest.TestCase):
         for state in ("DANGER", "LOW_RISK_NOT_PROOF", "ABSTAIN", "INJECTION_DETECTED"):
             self.assertIn(state, app_js)
 
+    def test_workspace_sidebar_exposes_sequential_progression(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        styles_css = (WEB_ROOT / "styles.css").read_text(encoding="utf-8")
+        for marker in ("WORKSPACE_STEPS", "workspaceProgress", "advance-workspace", "data-next-screen", "잠김"):
+            self.assertIn(marker, app_js)
+        for marker in ("figma-stepper-nav", "figma-step-arrow", "figma-step-footer"):
+            self.assertIn(marker, styles_css)
+
 
 if __name__ == "__main__":
     unittest.main()
