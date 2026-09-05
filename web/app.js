@@ -219,6 +219,7 @@ const LANDING_NAV_ITEMS = [
   { id: "before", label: "행동 전", type: "scroll", target: "landing-stage-before" },
   { id: "after-transfer", label: "송금 직후", type: "scroll", target: "landing-stage-after-transfer" },
   { id: "after-freeze", label: "계좌 정지 후", type: "scroll", target: "landing-stage-after-freeze" },
+  { id: "shield", label: "불법 추심", type: "screen", target: "shield" },
   { id: "try", label: "체험하기", type: "screen", target: "s00" },
 ];
 
@@ -227,6 +228,7 @@ const PROTOTYPE_NAV_ITEMS = [
   { id: "before", label: "행동 전", screen: "before", flow: "before" },
   { id: "after-transfer", label: "송금 직후", screen: "after", flow: "transfer" },
   { id: "after-freeze", label: "계좌 정지 후", screen: "s00", flow: "freeze" },
+  { id: "shield", label: "불법 추심", screen: "shield", flow: "shield" },
 ];
 
 const LANDING_STAGES = [
@@ -909,7 +911,7 @@ function updateNav() {
 }
 
 function renderOverview() {
-  const page = pageShell("00_OVERVIEW", "FinGuard — Wireframe v1", "의심 메시지를 받은 순간부터, 사람의 확인과 안전한 다음 행동까지 이어지는 프론트 화면 흐름입니다.", "overview-page");
+  const page = pageShell("00_OVERVIEW", "FinGuard — 서비스 개요", "의심 메시지를 받은 순간부터, 사람의 확인과 안전한 다음 행동까지 이어지는 서비스 흐름입니다.", "overview-page");
   const hero = el("section", "overview-hero");
   const heroCopy = el("div", "overview-hero-copy");
   append(heroCopy, el("span", "hero-kicker", "FINANCIAL CONVERSATION SAFETY GATE"), el("h2", "overview-title", "행동하기 전에,\n한 번 멈춰보세요."), el("p", "overview-lead", "문자·스크린샷·결제 링크를 확인하고 위험 신호, 근거 문장, 지금 멈출 행동을 한 화면에서 확인합니다."));
@@ -1747,6 +1749,7 @@ function prototypeNavRouteIsActive(route) {
     return state.screen === "after" || ((state.screen === "workspace" || CASE_SCREENS.some(([id]) => id === state.screen)) && state.entryFlow === "transfer");
   }
   if (route === "after-freeze") return ["s00", "g01", "g02", "g03", "workspace", ...CASE_SCREENS.map(([id]) => id)].includes(state.screen) && state.entryFlow === "freeze";
+  if (route === "shield") return ["shield", "shield-workspace"].includes(state.screen);
   return false;
 }
 

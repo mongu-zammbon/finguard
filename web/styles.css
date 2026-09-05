@@ -777,15 +777,11 @@ a { color: inherit; }
 .landing-brand { position: absolute; top: 21.64px; left: 56.1px; display: flex; align-items: flex-start; gap: 16.1px; height: 41.2px; }
 .landing-brand-mark { width: 32.8px; height: 41.1346px; }
 .landing-brand-name { margin-top: 11.4px; font-family: Arial, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; font-size: 23px; font-weight: 700; line-height: 28px; letter-spacing: .4px; }
-.landing-primary-nav { position: absolute; top: 40px; left: 463px; display: flex; align-items: flex-start; width: 565px; height: 18px; margin: 0; }
+.landing-primary-nav { position: absolute; top: 40px; left: 400px; display: flex; align-items: flex-start; justify-content: space-between; width: 650px; height: 18px; margin: 0; }
 .landing-nav-link { flex: 0 0 auto; min-height: 18px; height: 18px; padding: 0; border: 0; background: transparent; color: #667085; font-family: "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif; font-size: 15px; font-weight: 700; line-height: 18px; text-align: center; letter-spacing: 0; }
 .landing-nav-link.is-active { color: #175cd3; }
 .landing-nav-link.is-active::after { display: none; }
-.landing-primary-nav .landing-nav-link:nth-child(1) { width: 14px; margin-right: 80.5px; }
-.landing-primary-nav .landing-nav-link:nth-child(2) { width: 45px; margin-right: 78px; }
-.landing-primary-nav .landing-nav-link:nth-child(3) { width: 59px; margin-right: 72.5px; }
-.landing-primary-nav .landing-nav-link:nth-child(4) { width: 76px; margin-right: 84px; }
-.landing-primary-nav .landing-nav-link:nth-child(5) { width: 56px; }
+.landing-primary-nav .landing-nav-link:nth-child(n) { width: auto; margin-right: 0; }
 .landing-nav-tools { position: absolute; top: 22px; right: 56px; display: block; }
 .landing-nav-cta { position: relative; display: grid; width: 224px; height: 48px; min-height: 48px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #fff; font-family: "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif; font-size: 15px; font-weight: 700; line-height: 18px; place-items: center; }
 .landing-nav-cta-bg { position: absolute; top: -.5px; left: -.5px; z-index: 0; display: block; width: 225px; height: 49px; pointer-events: none; }

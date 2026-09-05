@@ -82,6 +82,8 @@ class ServerContractTests(unittest.TestCase):
             self.assertTrue((WEB_ROOT / asset).is_file(), asset)
         for marker in ("renderLandingPage", "landingNavigation", "landing-mobile-menu", "toggle-home-nav", "scroll-home"):
             self.assertIn(marker, app_js)
+        for label in ("불법 추심", "SHIELD · 불법 추심 대응"):
+            self.assertIn(label, app_js)
         for copy in ("금융사고 전후의 흩어진 자료를", "증거와 공식 다음 행동으로 바꿉니다."):
             self.assertIn(copy, app_js)
         for marker in ("landing-nav", "landing-primary-nav", "landing-menu-toggle", "landing-stage-grid"):
