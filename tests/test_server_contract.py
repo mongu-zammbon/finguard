@@ -63,10 +63,19 @@ class ServerContractTests(unittest.TestCase):
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
         self.assertIn('id="app-main"', index_html)
         self.assertIn('class="prototype-root"', index_html)
-        for screen in ("s00", "g01", "g02", "g03", "workspace", "reviewer", "components"):
+        for screen in ("home", "s00", "g01", "g02", "g03", "workspace", "reviewer", "components"):
             self.assertIn(f'"{screen}"', app_js)
         self.assertIn("figma-mobile-screen", app_js)
         self.assertIn("figma-desktop-frame", app_js)
+
+    def test_service_starts_with_responsive_main_navigation(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        styles_css = (WEB_ROOT / "styles.css").read_text(encoding="utf-8")
+        self.assertTrue((WEB_ROOT / "figma-brand-mark.svg").is_file())
+        for marker in ("renderLandingPage", "landingNavigation", "landing-mobile-menu", "toggle-home-nav", "scroll-home"):
+            self.assertIn(marker, app_js)
+        for marker in ("landing-nav", "landing-primary-nav", "landing-menu-toggle", "landing-stage-grid"):
+            self.assertIn(marker, styles_css)
 
     def test_service_exposes_optional_consent_flow_without_storage_claim(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
