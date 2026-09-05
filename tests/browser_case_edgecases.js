@@ -1,0 +1,70 @@
+async (page) => {
+  const check = (value, label) => { if (!value) throw new Error(label); };
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('button', { name: '연락 기록', exact: true }).click();
+  await page.getByLabel('자료 이름', { exact: true }).fill('TXT 검증 · 위협 원문');
+  await page.getByLabel('자료 출처 / 채널', { exact: true }).fill('합성 TXT 기록');
+  await page.locator('#record-text-file').setInputFiles('tests/fixtures/case-original.txt');
+  const original = await page.getByLabel('원문 내용', { exact: true }).inputValue();
+  check(original.includes('가만두지'), 'TXT import succeeds');
+  await page.locator('#record-text-file').setInputFiles('tests/browser_case_workspace.js');
+  check(await page.getByLabel('원문 내용', { exact: true }).inputValue() === original, 'Rejected file keeps draft');
+  await page.getByRole('button', { name: '원문 추가하고 확인하기', exact: true }).click();
+  check(await page.locator('.record-source-button').count() === 4, 'TXT connects without replacing prior sources');
+  const oldReview = await page.getByLabel('내가 확인한 내용', { exact: true }).inputValue();
+  await page.getByLabel('내가 확인한 내용', { exact: true }).fill('작성 중인 확인 설명');
+  await page.getByRole('button', { name: '상담 준비', exact: true }).click();
+  await page.getByRole('button', { name: '위험 신호', exact: true }).click();
+  check(await page.getByLabel('내가 확인한 내용', { exact: true }).inputValue() === '작성 중인 확인 설명', 'Unsaved review survives navigation');
+  await page.getByLabel('내가 확인한 내용', { exact: true }).fill(oldReview);
+  await page.getByRole('button', { name: '확인 내용 반영', exact: true }).click();
+  await page.getByRole('button', { name: '상담 준비', exact: true }).click();
+  const reportText = await page.frameLocator('.record-report-preview').locator('body').innerText();
+  check(!reportText.includes('UI 검증'), 'Shield report never imports Frozen facts');
+  const downloadEvent = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'HTML 내려받기', exact: true }).click();
+  const download = await downloadEvent;
+  await download.saveAs('/Users/seok/Documents/daycon/finguard/output/playwright/shield-counsel.html');
+  const popupEvent = page.waitForEvent('popup');
+  await page.getByRole('button', { name: '인쇄 / PDF로 저장', exact: true }).click();
+  const popup = await popupEvent;
+  await popup.waitForLoadState('domcontentloaded');
+  check((await popup.locator('body').innerText()).includes('상담 준비 자료'), 'Print window contains actual report');
+  check(await popup.locator('script').count() === 0, 'Print report remains script-free');
+  await popup.pdf({ path: '/Users/seok/Documents/daycon/finguard/output/playwright/shield-counsel.pdf', format: 'A4', printBackground: true });
+  await popup.close();
+  await page.getByRole('button', { name: 'FinGuard 홈', exact: true }).first().click();
+  await page.getByRole('button', { name: '소명 준비 시작하기', exact: true }).click();
+  await page.getByRole('button', { name: '사건 A로 체험 시작', exact: true }).click();
+  await page.getByRole('button', { name: '직접 입력', exact: true }).click();
+  await page.locator('#message').fill('두 번째 합성 사건의 새로운 메시지입니다.');
+  await page.getByRole('button', { name: '입력 내용 분석', exact: true }).click();
+  await page.waitForURL(/#g02\//);
+  await page.getByRole('button', { name: '자료 정리 범위 확인', exact: true }).click();
+  for (const box of await page.getByRole('checkbox').all()) await box.check();
+  await page.getByRole('button', { name: '위 규칙에 동의하고 사건 생성', exact: true }).click();
+  await page.getByRole('button', { name: '사건 개요 보기', exact: true }).click();
+  const other = page.getByRole('button', { name: /^사건 .* · 원문 4건$/ });
+  check(await other.count() === 1, 'Previous Frozen case remains separately selectable');
+  await page.getByRole('button', { name: '원문·사실 확인', exact: true }).click();
+  check(await page.locator('.record-source-button').count() === 1, 'New Gate case does not merge');
+  await page.goto('http://127.0.0.1:8876/#c03');
+  check((await page.locator('.record-original').innerText()).includes('두 번째 합성 사건'), 'Direct mobile C03 uses current case');
+  await page.getByRole('button', { name: '개요', exact: true }).click();
+  await page.getByRole('button', { name: /^사건 .* · 원문 4건$/ }).click();
+  await page.getByRole('button', { name: '원문·사실 확인', exact: true }).click();
+  check(await page.locator('.record-source-button').count() === 4, 'Previous case restores original materials');
+  await page.locator('.record-source-button').filter({ hasText: '중고 물품 주문' }).click();
+  check((await page.getByLabel('내가 확인한 내용', { exact: true }).inputValue()).includes('UI 검증'), 'Previous case restores confirmed edit');
+  const viewports = [];
+  for (const width of [1440, 1024, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ['#workspace/c02', '#workspace/c03', '#workspace/c07', '#shield-workspace/s02', '#shield-workspace/s07']) {
+      await page.goto('http://127.0.0.1:8876/' + route);
+      check(!(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)), 'No overflow: ' + route + ' @ ' + width);
+      viewports.push(route + '@' + width);
+    }
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  return { passed: true, txt: 'valid imported / invalid preserves draft', isolatedCases: true, mobileRoute: true, htmlDownloaded: true, printWindowAndPdf: true, layoutChecks: viewports.length };
+}

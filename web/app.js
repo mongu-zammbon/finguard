@@ -319,7 +319,7 @@ const SHIELD_STEPS = [
 const WORKSPACE_STEPS = [
   { id: "c01", label: "개요", routes: ["c01"] },
   { id: "c02", label: "자료 수집", routes: ["c02"] },
-  { id: "c03", label: "AI 사실 확인", routes: ["c03"] },
+  { id: "c03", label: "원문·사실 확인", routes: ["c03"] },
   { id: "c04", label: "거래 연결", routes: ["c04"] },
   { id: "c05", label: "이슈 검토", routes: ["c05a", "c05b"] },
   { id: "c06", label: "타임라인", routes: ["c06"] },
@@ -1988,7 +1988,7 @@ function renderActualC01Mobile() {
 function renderActualC03Mobile() {
   if (!state.showReference) return renderRecordWorkspace("frozen", "c03");
   const body = el("div", "figma-screen-content figma-case-content");
-  body.append(figmaAlert("AI 검토", "원문과 추출값을 비교하세요"), figmaEvidenceList([
+  body.append(figmaAlert("원문·사실 확인", "원문과 정리된 항목을 비교하세요"), figmaEvidenceList([
     ["금전 요구", "신고 취소를 조건으로 500,000원을 요구"],
     ["긴급성", "오늘 2시 전까지 송금하도록 압박"],
     ["비밀 요구", "은행에 알리지 말라고 요구"],
@@ -2245,7 +2245,7 @@ function renderActualC03Desktop() {
   const columns = el("div", "figma-fact-workspace");
   const original = figmaDesktopSection("원문 증거 E-001", "사용자가 보관한 최초 메시지");
   original.append(el("blockquote", "figma-original-quote", FIGMA_SAMPLE_TEXT), el("small", "figma-source-meta", "사용자 공유 · 2026. 08. 30 · 14:02"));
-  const facts = figmaDesktopSection("추출 사실", "AI 초안과 사람 확인 상태를 분리합니다.");
+  const facts = figmaDesktopSection("확인 항목", "자동 정리 초안과 사람 확인 상태를 분리합니다.");
   [["F-001", "금전 요구", "신고 취소를 조건으로 송금 요구"], ["F-002", "긴급성", "오늘 2시 전까지 송금하도록 압박"], ["F-003", "비밀 요구", "은행에 알리지 말라고 요구"]].forEach(([id, label, value]) => {
     const row = button("", `figma-fact-row ${state.selectedFact === id ? "is-selected" : ""}`.trim(), { "data-action": "select-fact", "data-fact-id": id });
     append(row, el("strong", "", id), figmaBadge(label, "figma-badge-neutral"), el("p", "", value), el("span", "figma-fact-link", "원문 근거 보기"));
@@ -2255,7 +2255,7 @@ function renderActualC03Desktop() {
   preview.append(el("div", "figma-message-preview", FIGMA_SAMPLE_TEXT), figmaCallout("사람 확인 필요", "AI 결과만 믿고 확정·제출하지 않습니다.", "danger"));
   columns.append(original, facts, preview);
   content.append(columns, figmaPrimary("사건 개요로 돌아가기", "screen", { "data-screen": "workspace", "data-case-screen": "c01" }));
-  return figmaDesktopFrame(workspaceRail("c03"), "AI 사실 확인", "원문과 추출값을 비교하고 확인 상태를 남깁니다.", content);
+  return figmaDesktopFrame(workspaceRail("c03"), "원문·사실 확인", "원문과 정리된 항목을 비교하고 확인 상태를 남깁니다.", content);
 }
 
 function renderActualC04Desktop() {

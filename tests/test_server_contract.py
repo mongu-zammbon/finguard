@@ -63,7 +63,7 @@ class ServerContractTests(unittest.TestCase):
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
         self.assertIn('id="app-main"', index_html)
         self.assertIn('class="prototype-root"', index_html)
-        for screen in ("home", "s00", "g01", "g02", "g03", "before", "before-result", "workspace", "reviewer", "components"):
+        for screen in ("home", "s00", "g01", "g02", "g03", "before", "before-result", "after", "shield", "workspace", "reviewer", "components"):
             self.assertIn(f'"{screen}"', app_js)
         self.assertIn("figma-mobile-screen", app_js)
         self.assertIn("figma-desktop-frame", app_js)
@@ -82,18 +82,19 @@ class ServerContractTests(unittest.TestCase):
             self.assertTrue((WEB_ROOT / asset).is_file(), asset)
         for marker in ("renderLandingPage", "landingNavigation", "landing-mobile-menu", "toggle-home-nav", "scroll-home"):
             self.assertIn(marker, app_js)
-        for copy in ("금융사고 전후의 흩어진 자료를", "지급정지 소명팩을 구성합니다."):
+        for copy in ("금융사고 전후의 흩어진 자료를", "증거와 공식 다음 행동으로 바꿉니다."):
             self.assertIn(copy, app_js)
         for marker in ("landing-nav", "landing-primary-nav", "landing-menu-toggle", "landing-stage-grid"):
             self.assertIn(marker, styles_css)
 
-    def test_after_freeze_entry_uses_gate_flow(self) -> None:
+    def test_after_freeze_entry_starts_with_frozen_gate_intro(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
         start = app_js.index('id: "landing-stage-after-freeze"')
         end = app_js.index("\n  },\n];", start)
         stage = app_js[start:end]
         self.assertIn('action: "소명 준비 시작하기"', stage)
         self.assertIn('target: "s00"', stage)
+        self.assertIn('flow: "freeze"', stage)
 
     def test_service_exposes_optional_consent_flow_without_storage_claim(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
@@ -104,7 +105,8 @@ class ServerContractTests(unittest.TestCase):
             '"hold-consent"',
         ):
             self.assertIn(marker, app_js)
-        self.assertIn("실제 사건 생성·저장은 실행하지 않는 mock 흐름입니다", app_js)
+        self.assertIn("startFrozenRecord(state.message)", app_js)
+        self.assertIn("서버나 브라우저 저장소에는 보관하지 않습니다", app_js)
 
     def test_frontend_covers_the_figma_screen_map(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
@@ -114,6 +116,13 @@ class ServerContractTests(unittest.TestCase):
             self.assertIn(f'"{screen}"', app_js)
         for state in ("DANGER", "LOW_RISK_NOT_PROOF", "ABSTAIN", "INJECTION_DETECTED"):
             self.assertIn(state, app_js)
+        for marker in ("FROZEN · 계좌가 막힌 후", "소명팩을 준비합니다", "소명팩 준비 상태", "renderActualC01Desktop"):
+            self.assertIn(marker, app_js)
+
+    def test_three_stage_entry_points_are_explicit(self) -> None:
+        app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
+        for marker in ("AFTER · 송금 직후", "SHIELD · 불법 추심 대응", 'target: "after"', 'target: "s00"'):
+            self.assertIn(marker, app_js)
 
     def test_workspace_sidebar_exposes_sequential_progression(self) -> None:
         app_js = (WEB_ROOT / "app.js").read_text(encoding="utf-8")
